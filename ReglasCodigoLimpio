@@ -1,0 +1,72 @@
+🧼 Reglas de Código Limpio
+1. Nombres significativos
+Usa nombres descriptivos y expresivos.
+
+
+Evita abreviaciones crípticas.
+
+
+El nombre debe revelar la intención del elemento (variable, función, clase).
+
+
+2. Funciones pequeñas y específicas
+Las funciones deben hacer una sola cosa y hacerla bien.
+
+
+Evita funciones largas; preferiblemente quepan en la pantalla sin hacer scroll.
+
+
+El nombre debe decir exactamente qué hace.
+
+
+3. Evita comentarios innecesarios
+El buen código se explica solo; comenta solo lo que no puede expresarse claramente en código.
+
+
+Prefiere mejorar el código antes que añadir un comentario que lo explique.
+
+
+4. Formato consistente
+Indentación clara y consistente.
+
+
+Espaciado que facilite la lectura.
+
+
+Agrupa visualmente secciones relacionadas.
+
+
+5. Evita la duplicación
+Reutiliza funciones y estructuras.
+
+
+DRY: Don't Repeat Yourself.
+
+
+6. Manejo claro de errores
+Usa excepciones, no códigos de error.
+
+
+No ocultes errores; hazlos visibles y manejables.
+
+
+7. Objetos y estructuras bien definidos
+Una clase debe tener una sola responsabilidad (SRP: Single Responsibility Principle).
+
+
+Métodos públicos primero, luego los privados.
+
+
+No mezcles responsabilidades (ej. lógica de negocios con lógica de presentación).
+
+
+9. Evita números mágicos y cadenas sueltas
+Usa constantes con nombres significativos en lugar de números o strings sin explicación.
+
+
+10. Simplicidad ante todo
+Si algo se puede hacer de forma más simple y clara, hazlo así.
+
+
+"Hazlo funcionar, hazlo bien, luego hazlo rápido."
+
