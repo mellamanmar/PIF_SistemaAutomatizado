@@ -12,28 +12,43 @@ import java.util.Scanner;
  */
 public class GestionEditorial {
     public static final Scanner read = new Scanner(System.in);
-    Redactor redactor = new Redactor("simon");
-    Editor editor = new Editor();
+    Redactor redactor = new Redactor(1, "simon", 0, Redactor.Region.SUR_AMERICA);
+    Editor editor = new Editor("simon", 123);
     byte option = 0;
 
+    public boolean searchRedactors(int id) {
+        for (Redactor redactor : editor.listRedactors) {
+            return id == redactor.getRedactorId();      
+        }
+        return false;
+
+    }
     public void mainMenu() {
         do {
-            System.out.println("""
-                               Seleccione su usuario:
+            System.out.print("""
+                             
                                1. Redactor.
                                2. Editor.
-                               3. Salir del programa.""");
+                               0. Salir del programa.
+                               Seleccione su usuario: """);
             option = read.nextByte();
             switch (option) {
                 case 1 -> {
-                    redactor.menuOptions();
+                    System.out.print("Ingrese su ID:");
+                    int idToSearch = read.nextInt();
+                    if (searchRedactors(idToSearch)){                        
+                        redactor.menuOptions();
+                    }else{
+                        System.out.println("No existe ese redactor");
+                    }
+                    
                     break;
                 }
                 case 2 -> {
                     editor.menuOptions();
                     break;
                 }
-                case 3 -> {
+                case 0 -> {
                     break;
                 }
                 default -> {
@@ -41,6 +56,6 @@ public class GestionEditorial {
                 }
             }//end of switch
 
-        } while (option!= 3);
+        } while (option!= 0);
     }
 }

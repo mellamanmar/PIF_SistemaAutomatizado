@@ -10,5 +10,5 @@ package gestion;
  */
 public interface Consult {
     public void menuOptions();
-    
+        
 }
