@@ -12,15 +12,15 @@ import java.util.Deque;
  * @author general
  */
 public class Redactor implements Consult {
-    
+
     private int redactorId;
     private String redactorName;
     private double pricePerWord;
     private Region region;
-    //private Article article;
-    Deque<Article> articleQueue = new ArrayDeque<>();
-    
-    enum Region{
+    private Article article;
+    Deque<Article> articlesQueue = new ArrayDeque<>();
+
+    enum Region {
         NORTE_AMERICA, CENTRO_AMERICA, SUR_AMERICA, EUROPA, ASIA, AFRICA, OCEANIA
     }
 
@@ -30,14 +30,13 @@ public class Redactor implements Consult {
         this.pricePerWord = pricePerWord;
         this.region = region;
         //this.article = article;
-    }   
-  
-    
+    }
 
     @Override
     public String toString() {
         return "ID: " + redactorId + ", Nombre: " + redactorName;
     }
+
     public int getRedactorId() {
         return redactorId;
     }
@@ -62,14 +61,14 @@ public class Redactor implements Consult {
         this.pricePerWord = pricePerWord;
     }
 
-    public Region getRegion() {
-        return region;
-    }
+//    public Region getRegion() {
+//        return region;
+//    }
+//
+//    public void setRegion(Region region) {
+//        this.region = region;
+//    }
 
-    public void setRegion(Region region) {
-        this.region = region;
-    }
-/*
     public Article getArticle() {
         return article;
     }
@@ -77,10 +76,11 @@ public class Redactor implements Consult {
     public void setArticle(Article article) {
         this.article = article;
     }
-*/
-    
-    
-  
+
+    public void addArticle(Article article){
+        articlesQueue.offer(article);
+    }
+
     @Override
     public void menuOptions() {
         byte optionRedactor = 0;

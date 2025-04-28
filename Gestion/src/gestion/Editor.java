@@ -62,7 +62,7 @@ public class Editor implements Consult {
                 break;
             } else {
 
-                System.out.println("no existe ese redactor");
+                System.out.println("No existe ese redactor");
             }
         }
 
@@ -74,7 +74,7 @@ public class Editor implements Consult {
                 return redactor;
             } else {
 
-                System.out.println("no existe ese redactor");
+                System.out.println("No existe ese redactor");
             }
         }
         return null;
@@ -136,7 +136,6 @@ public class Editor implements Consult {
         byte optionActionsRedactor = 0;
         do {
             System.out.print("""
-                             
                                1. Agregar redactor.
                                2. Eliminar redactor.
                                3. Consultar redactores.
@@ -150,14 +149,14 @@ public class Editor implements Consult {
                     int idRedactor = GestionEditorial.read.nextInt();
                     GestionEditorial.read.nextLine();
 
-                    System.out.print("Ingresa el nombre del redactor: ");
+                    System.out.print("Ingrese el nombre del redactor: ");
                     String nameRedactor = GestionEditorial.read.nextLine();
                     
                     System.out.println("Ingrese el precio por palabra");
                     double pricePerWord = GestionEditorial.read.nextDouble();
                     
                     //System.out.println("Ingrese la region a la que pertenece el redactor");
-                    
+                    //String region = GestionEditorial.read.next();
 
                     Redactor newRedactor = new Redactor(idRedactor, nameRedactor, pricePerWord, Redactor.Region.SUR_AMERICA);
 
@@ -166,7 +165,7 @@ public class Editor implements Consult {
                 }
                 case 2 -> {
                     if (!listRedactors.isEmpty()) {
-                        System.out.print("Ingrese el id del redactor que deseas eliminar: ");
+                        System.out.print("Ingrese el ID del redactor que deseas eliminar: ");
                         int idToRemove = GestionEditorial.read.nextInt();
                         GestionEditorial.read.nextLine();
 
@@ -191,7 +190,7 @@ public class Editor implements Consult {
                 }
                 case 4 -> {
                     if (!listRedactors.isEmpty()) {
-                        System.out.print("Ingresa el id del redactor que deseas buscar: ");
+                        System.out.print("Ingrese el ID del redactor que deseas buscar: ");
                         int idToSearch = GestionEditorial.read.nextInt();
                         showRedactor(idToSearch);
                     } else {
@@ -210,8 +209,11 @@ public class Editor implements Consult {
 
     
     public void addArticle(Article article){
-        listArticles.add(article);
-        
+        if (article.getRedactor()!= null){
+            GestionEditorial.redactor.addArticle(article);
+        }else {
+            listArticles.add(article);
+        }   
     }
     
     public void showArticles() {
@@ -223,13 +225,16 @@ public class Editor implements Consult {
     public void showArticle(String url) {
         for (Article article : listArticles) {
             if (!url.equalsIgnoreCase(article.getUrl())) {                
-                System.out.println("no existe ese articulo");
+                System.out.println("No existe ese articulo");
             } else {
                 System.out.println(article);
                 break;
             }
         }
-
+    }
+    
+    public void reviewArticle(){
+        
     }
     
     public void addToEditorsQueue(Article article){
@@ -246,7 +251,7 @@ public class Editor implements Consult {
                                3. Consultar articulo.
                                4. Asignar articulo.
                                5. Revisar articulo
-                               6. salir.
+                               6. Salir.
                                Seleccione la accion que quiere hacer: """);
             optionActionsArticle = GestionEditorial.read.nextByte();
             switch (optionActionsArticle) {
@@ -263,11 +268,11 @@ public class Editor implements Consult {
                     
                     if (searchedId != -1 ){
                         searchRedactor(searchedId);
-                        Article article = new Article(articleName, articleUrl/*, searchRedactor*/);
+                        Article article = new Article(articleName, articleUrl, GestionEditorial.redactor, GestionEditorial.editor.getEditorId(), Article.Estado.ASIGNADO);
                         addArticle(article);
-                        //se lo manda a la cola
+                        //Se ejecuta la función y agrega el artículo a la lista correspondiente
                     }else{
-                         Article article = new Article(articleName, articleUrl/*, null*/);
+                         Article article = new Article(articleName, articleUrl, null, GestionEditorial.editor.editorId, Article.Estado.POR_ASIGNAR);
                          addArticle(article);
                     }               
                   
@@ -292,10 +297,20 @@ public class Editor implements Consult {
                     break;
                 }
                 case 4 -> {
-                    
+                    System.out.println("Ingrese el ID del redactor que va a asignar el articulo");
+                    int idToSearch = GestionEditorial.read.nextInt();
+                    Redactor redactorTpm = searchRedactor(idToSearch);
+                    for (Article article : listArticles){
+                        if ((article.getRedactor()!= null) && article.getEstado().equals(POR_ASIGNAR)){
+                            redactorTpm.addArticle(article);
+                        } else {
+                            System.out.println(article.getEstado());
+                        }
+                    }
                     break;
                 }
                 case 5 ->{
+                    //Revisar la cola de articulos del redactor por estado y cambiar el estado según la revisión
                     break;
                 }
                 case 6 ->{

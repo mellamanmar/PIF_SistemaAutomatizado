@@ -12,17 +12,19 @@ import java.util.Scanner;
  */
 public class GestionEditorial {
     public static final Scanner read = new Scanner(System.in);
-    Redactor redactor = new Redactor(1, "simon", 0, Redactor.Region.SUR_AMERICA);
-    Editor editor = new Editor("simon", 123);
+    static final Redactor redactor = new Redactor(1, "simon", 0, Redactor.Region.SUR_AMERICA);
+    static final Editor editor = new Editor("simon", 123);
     byte option = 0;
-
+    
+    //Busca redactores en la lista del editor
     public boolean searchRedactors(int id) {
         for (Redactor redactor : editor.listRedactors) {
             return id == redactor.getRedactorId();      
         }
         return false;
-
     }
+    
+    //Menú principal
     public void mainMenu() {
         do {
             System.out.print("""
@@ -36,6 +38,7 @@ public class GestionEditorial {
                 case 1 -> {
                     System.out.print("Ingrese su ID:");
                     int idToSearch = read.nextInt();
+                    // Utiliza la función searchRedactors para buscar
                     if (searchRedactors(idToSearch)){                        
                         redactor.menuOptions();
                     }else{
