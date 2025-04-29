@@ -227,14 +227,22 @@ public class Editor implements Consult {
             if (!url.equalsIgnoreCase(article.getUrl())) {                
                 System.out.println("No existe ese articulo");
             } else {
-                System.out.println(article);
+                System.out.println(article.toString());
                 break;
             }
         }
     }
     
-    public void reviewArticle(){
-        
+    public void reviewArticle(Article article){
+        article.setEstado(Article.Estado.CORREGIDO); 
+    }
+    
+    public void returnArticle(Article article){
+        article.setEstado(Article.Estado.DEVUELTO);
+    }
+    
+    public void publishArticle(Article article){
+        article.setEstado(Article.Estado.PUBLICADO);
     }
     
     public void addToEditorsQueue(Article article){
@@ -245,7 +253,6 @@ public class Editor implements Consult {
         short optionActionsArticle = 0;
         do {
             System.out.print("""
-                             
                                1. Agregar articulo.
                                2. Consultar articulos.
                                3. Consultar articulo.
@@ -258,24 +265,23 @@ public class Editor implements Consult {
                 case 1 -> {
                     System.out.print("Ingrese el nombre del articulo: ");
                     String articleName = GestionEditorial.read.nextLine();
-                    
-                    System.out.print("Ingrese el url del articulo");                    
+                    GestionEditorial.read.nextLine();
+                    System.out.print("Ingrese el url del articulo: ");                    
                     String articleUrl = GestionEditorial.read.nextLine();
-                    
+                    GestionEditorial.read.nextLine();
                     System.out.print("Ingrese el id del redactor que va escribir este articulo o -1. si no tiene redactor asignado: ");
                     int searchedId = GestionEditorial.read.nextInt();
                     GestionEditorial.read.nextLine();
                     
                     if (searchedId != -1 ){
-                        searchRedactor(searchedId);
-                        Article article = new Article(articleName, articleUrl, GestionEditorial.redactor, GestionEditorial.editor.getEditorId(), Article.Estado.ASIGNADO);
+                        Redactor redactorTpm = searchRedactor(searchedId);
+                        Article article = new Article(articleName, articleUrl, redactorTpm, GestionEditorial.editor.getEditorId(), Article.Estado.ASIGNADO);
                         addArticle(article);
                         //Se ejecuta la función y agrega el artículo a la lista correspondiente
                     }else{
                          Article article = new Article(articleName, articleUrl, null, GestionEditorial.editor.editorId, Article.Estado.POR_ASIGNAR);
                          addArticle(article);
-                    }               
-                  
+                    }
                     break;
                 }
                 case 2 -> {
@@ -297,11 +303,11 @@ public class Editor implements Consult {
                     break;
                 }
                 case 4 -> {
-                    System.out.println("Ingrese el ID del redactor que va a asignar el articulo");
+                    System.out.println("Ingrese el ID del redactor al que va a asignar el articulo");
                     int idToSearch = GestionEditorial.read.nextInt();
                     Redactor redactorTpm = searchRedactor(idToSearch);
                     for (Article article : listArticles){
-                        if ((article.getRedactor()!= null) && article.getEstado().equals(POR_ASIGNAR)){
+                        if ((article.getRedactor()!= null) && (article.getEstado().equals(Article.Estado.POR_ASIGNAR))){
                             redactorTpm.addArticle(article);
                         } else {
                             System.out.println(article.getEstado());
