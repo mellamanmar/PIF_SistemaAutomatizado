@@ -40,6 +40,8 @@ public class Editor implements Consult {
     ArrayList<Redactor> listRedactors = new ArrayList<>();
     
     ArrayList<Article> listArticles = new ArrayList<>();
+    ArrayList<Article> listPublishArticles = new ArrayList<>();
+    
 
     public void addRedactor(Redactor redactor) {
         listRedactors.add(redactor);
@@ -82,6 +84,7 @@ public class Editor implements Consult {
     
     /*
     public double calculatePayments( int id ){
+    Utilizar la llista de articulos publicados
         for (Redactor redactor : listRedactors) {
             if (id == redactor.getRedactorId()) {
                 //obtiene los datos para calcular
@@ -216,12 +219,18 @@ public class Editor implements Consult {
         }   
     }
     
+    public void removeArticle(Article article){
+        listArticles.remove(article);
+    }
+    
+    //Se necesita que traiga el objeto (salida de la función) porque esta trayendo el apuntador. LESLY
     public void showArticles() {
         for (Article article : listArticles) {
             System.out.println(article);
         }
     }
-
+    
+    //Para buscar por ID cambiar la url por el ID que ingresa el usuario desde el menu
     public void showArticle(String url) {
         for (Article article : listArticles) {
             if (!url.equalsIgnoreCase(article.getUrl())) {                
@@ -234,15 +243,20 @@ public class Editor implements Consult {
     }
     
     public void reviewArticle(Article article){
-        article.setEstado(Article.Estado.CORREGIDO); 
+        article.setEstado(Article.Estado.CORREGIDO);
+        GestionEditorial.redactor.removeArticle(article);
     }
     
     public void returnArticle(Article article){
         article.setEstado(Article.Estado.DEVUELTO);
+        GestionEditorial.redactor.addArticle(article);
+        removeArticle(article);
     }
     
     public void publishArticle(Article article){
         article.setEstado(Article.Estado.PUBLICADO);
+        listPublishArticles.add(article);
+        removeArticle(article);
     }
     
     public void addToEditorsQueue(Article article){
@@ -255,11 +269,13 @@ public class Editor implements Consult {
             System.out.print("""
                                1. Agregar articulo.
                                2. Consultar articulos.
-                               3. Consultar articulo.
+                               3. Consultar articulo. 
                                4. Asignar articulo.
                                5. Revisar articulo
                                6. Salir.
                                Seleccione la accion que quiere hacer: """);
+            //Verificar las funciones de consultar artículo para integrarlo 
+            //con la lista completa de artículos, y tomar por ID el artículo que se quiera consultar
             optionActionsArticle = GestionEditorial.read.nextByte();
             switch (optionActionsArticle) {
                 case 1 -> {
@@ -269,17 +285,17 @@ public class Editor implements Consult {
                     System.out.print("Ingrese el url del articulo: ");                    
                     String articleUrl = GestionEditorial.read.nextLine();
                     GestionEditorial.read.nextLine();
-                    System.out.print("Ingrese el id del redactor que va escribir este articulo o -1. si no tiene redactor asignado: ");
+                    System.out.print("Ingrese el ID del redactor que va escribir este articulo o -1. si no tiene redactor asignado: ");
                     int searchedId = GestionEditorial.read.nextInt();
                     GestionEditorial.read.nextLine();
                     
                     if (searchedId != -1 ){
                         Redactor redactorTpm = searchRedactor(searchedId);
-                        Article article = new Article(articleName, articleUrl, redactorTpm, GestionEditorial.editor.getEditorId(), Article.Estado.ASIGNADO);
+                        Article article = new Article(articleName, articleUrl, redactorTpm, 0, Article.Estado.ASIGNADO);
                         addArticle(article);
                         //Se ejecuta la función y agrega el artículo a la lista correspondiente
                     }else{
-                         Article article = new Article(articleName, articleUrl, null, GestionEditorial.editor.editorId, Article.Estado.POR_ASIGNAR);
+                         Article article = new Article(articleName, articleUrl, null, 0, Article.Estado.POR_ASIGNAR);
                          addArticle(article);
                     }
                     break;

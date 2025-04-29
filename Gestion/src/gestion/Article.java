@@ -6,13 +6,12 @@ package gestion;
 
 
 public class Article {
-
+// Agregar un ID que se autoincremente solo size()+1
     private String titulo;
     private String url;
     private Redactor redactor;
     private int numPalabras;
     private Estado estado;
-    public String name;
 
     enum Estado {
         POR_ASIGNAR,
@@ -20,10 +19,7 @@ public class Article {
         COMPLETADO,
         CORREGIDO,
         DEVUELTO,
-        PUBLICADO,
-        PRUEBA,
-        PRUEBA_2
-
+        PUBLICADO
     }
 
     public Article(String titulo, String url, Redactor redactor, int numPalabras, Estado estado) {
@@ -33,7 +29,11 @@ public class Article {
         this.numPalabras = numPalabras;
         this.estado = estado;
     }
-
+    
+    @Override
+    public String toString(){
+        return this.titulo + this.url ; //Completar el toString con los atributos del articulo. LESLY
+    }
     public String getTitulo() {
         return titulo;
     }

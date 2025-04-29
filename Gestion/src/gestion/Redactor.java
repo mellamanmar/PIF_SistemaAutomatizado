@@ -80,13 +80,19 @@ public class Redactor implements Consult {
     public void addArticle(Article article){
         articlesQueue.offer(article);
     }
+    
+    //Función que cambie el estado a COMPLETADO y envíe el articulo a la lista general del editor
+    
+    public void removeArticle (Article article){
+        articlesQueue.remove(article);
+    }
 
     @Override
     public void menuOptions() {
         byte optionRedactor = 0;
         System.out.print("""
                             
-                            1. Consultar articulos.
+                            1. Consultar articulos pendientes.
                             2. Modificar ESTADO de articulo.
                             3. Ver reporte de mes.
                             4. Salir.
