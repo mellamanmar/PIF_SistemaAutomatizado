@@ -12,6 +12,7 @@ public class Article {
     private Redactor redactor;
     private int numPalabras;
     private Estado estado;
+    public String name;
 
     enum Estado {
         POR_ASIGNAR,
