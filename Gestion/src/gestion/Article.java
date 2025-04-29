@@ -19,7 +19,9 @@ public class Article {
         COMPLETADO,
         CORREGIDO,
         DEVUELTO,
-        PUBLICADO
+        PUBLICADO,
+        PRUEBA,
+        PRUEBA_2
 
     }
 
