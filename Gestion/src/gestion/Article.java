@@ -6,7 +6,9 @@ package gestion;
 
 
 public class Article {
-// Agregar un ID que se autoincremente solo size()+1
+// Agregar un ID que se autoincremente solo size()+1 
+    private static int counter = 0;
+    private int id;
     private String titulo;
     private String url;
     private Redactor redactor;
@@ -23,6 +25,7 @@ public class Article {
     }
 
     public Article(String titulo, String url, Redactor redactor, int numPalabras, Estado estado) {
+        this.id = ++counter;
         this.titulo = titulo;
         this.url = url;
         this.redactor = redactor;
@@ -30,9 +33,13 @@ public class Article {
         this.estado = estado;
     }
     
+    public int getId(){
+        return id;
+    }
     @Override
     public String toString(){
-        return this.titulo + this.url ; //Completar el toString con los atributos del articulo. LESLY
+        return "ID: "+this.id + ", titulo: "+this.titulo + ", URL: "+this.url +  ", Palabras: " + numPalabras +
+                ", estado: " + estado + ", redactor: " + (redactor != null ? redactor.getRedactorName() : "No asignado"); //Completar el toString con los atributos del articulo. LESLY
     }
     public String getTitulo() {
         return titulo;
