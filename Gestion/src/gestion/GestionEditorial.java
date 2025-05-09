@@ -12,7 +12,7 @@ import java.util.Scanner;
  */
 public class GestionEditorial {
     public static final Scanner read = new Scanner(System.in);
-    static final Redactor redactor = new Redactor(1, "simon", 0, Redactor.Region.SUR_AMERICA);
+    static final Redactor redactor = new Redactor("Simon", 0, Redactor.Region.EUROPA, null);
     static final Editor editor = new Editor("simon", 123);
     byte option = 0;
     
@@ -27,7 +27,7 @@ public class GestionEditorial {
     //Menú principal
     public void mainMenu() {
         do {
-            System.out.print("""
+            System.out.println("""
                              
                                1. Redactor.
                                2. Editor.
@@ -36,7 +36,7 @@ public class GestionEditorial {
             option = read.nextByte();
             switch (option) {
                 case 1 -> {
-                    System.out.print("Ingrese su ID:");
+                    System.out.println("Ingrese su ID:");
                     int idToSearch = read.nextInt();
                     // Utiliza la función searchRedactors para buscar
                     if (searchRedactors(idToSearch)){                        

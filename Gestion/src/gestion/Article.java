@@ -7,15 +7,15 @@ package gestion;
 
 public class Article {
 // Agregar un ID que se autoincremente solo size()+1 
-    private static int counter = 0;
+    private static int counter;
     private int id;
-    private String titulo;
+    private String keyword;
     private String url;
     private Redactor redactor;
     private int numPalabras;
     private Estado estado;
 
-    enum Estado {
+    public enum Estado {
         POR_ASIGNAR,
         ASIGNADO,
         COMPLETADO,
@@ -24,29 +24,46 @@ public class Article {
         PUBLICADO
     }
 
-    public Article(String titulo, String url, Redactor redactor, int numPalabras, Estado estado) {
-        this.id = ++counter;
-        this.titulo = titulo;
-        this.url = url;
+    public Article(String keyword, String url, Redactor redactor, int numPalabras, Estado estado) {
+        this.keyword = keyword;
         this.redactor = redactor;
-        this.numPalabras = numPalabras;
         this.estado = estado;
+        this.id = counter;
+        if (counter == 0){
+            counter = 1;
+        } else {
+            counter++;
+        }
     }
     
-    public int getId(){
-        return id;
+    private static void incrementCounter(){
+        if (counter == 0){
+            counter = 1;
+        } else {
+            counter++;
+        }
     }
+    
+    
     @Override
     public String toString(){
-        return "ID: "+this.id + ", titulo: "+this.titulo + ", URL: "+this.url +  ", Palabras: " + numPalabras +
-                ", estado: " + estado + ", redactor: " + (redactor != null ? redactor.getRedactorName() : "No asignado"); //Completar el toString con los atributos del articulo. LESLY
+        return "Keyword del artículo: "+this.keyword + "\n URL: "+ this.url +  "\n Palabras: " + numPalabras +
+                "\n Estado: " + this.estado + "\n Redactor: " + (redactor != null ? redactor.getRedactorName() : "Sin asignar");
     }
-    public String getTitulo() {
-        return titulo;
+    public String getKeyword() {
+        return keyword;
     }
 
-    public void setTitulo(String titulo) {
-        this.titulo = titulo;
+    public void setKeyword(String keyword) {
+        this.keyword = keyword;
+    }
+    
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getUrl() {

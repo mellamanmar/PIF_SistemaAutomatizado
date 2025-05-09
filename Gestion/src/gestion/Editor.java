@@ -5,6 +5,7 @@
 package gestion;
 
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
 // comentario de lesly
 /**
  *
@@ -38,7 +39,6 @@ public class Editor implements Consult {
 
     //Objects
     ArrayList<Redactor> listRedactors = new ArrayList<>();
-    
     ArrayList<Article> listArticles = new ArrayList<>();
     ArrayList<Article> listPublishArticles = new ArrayList<>();
     
@@ -101,7 +101,7 @@ public class Editor implements Consult {
     public void menuOptions() {
         byte optionEditor = 0;
         do {
-            System.out.print(""" 
+            System.out.println(""" 
                              
                                1. Acciones con redactor.
                                2. Acciones con articulos.
@@ -120,7 +120,7 @@ public class Editor implements Consult {
                 }
                 case 3 -> {
                     showRedactors();
-                    System.out.print("Seleccione ingresando el id del redactor al que le quiere calcular el pago.\nIngrese ID: ");
+                    System.out.println("Seleccione ingresando el id del redactor al que le quiere calcular el pago.\nIngrese ID: ");
                     int idToSearch = GestionEditorial.read.nextInt();                    
                     //calculatePayments( idToSearch );   
                     break;
@@ -136,9 +136,10 @@ public class Editor implements Consult {
     }
 
     public void menuActionsRedactor() {
+        Redactor.Region[] regions = Redactor.Region.values();
         byte optionActionsRedactor = 0;
         do {
-            System.out.print("""
+            System.out.println("""
                                1. Agregar redactor.
                                2. Eliminar redactor.
                                3. Consultar redactores.
@@ -148,20 +149,13 @@ public class Editor implements Consult {
             optionActionsRedactor = GestionEditorial.read.nextByte();
             switch (optionActionsRedactor) {
                 case 1 -> {
-                    System.out.print("Ingresa el ID del redactor: ");
-                    int idRedactor = GestionEditorial.read.nextInt();
-                    GestionEditorial.read.nextLine();
-
-                    System.out.print("Ingrese el nombre del redactor: ");
-                    String nameRedactor = GestionEditorial.read.nextLine();
+                    String nameRedactor = JOptionPane.showInputDialog("Ingrese el nombre del redactor: ");
                     
-                    System.out.println("Ingrese el precio por palabra");
-                    double pricePerWord = GestionEditorial.read.nextDouble();
+                    double pricePerWord = Double.parseDouble(JOptionPane.showInputDialog("Ingrese el precio por palabra"));                    
                     
-                    //System.out.println("Ingrese la region a la que pertenece el redactor");
-                    //String region = GestionEditorial.read.next();
+                    Redactor.Region regionSelect = (Redactor.Region) JOptionPane.showInputDialog(null, "Selecciona la region del redactor", "Opciones", JOptionPane.QUESTION_MESSAGE, null, regions, regions[0]);
 
-                    Redactor newRedactor = new Redactor(idRedactor, nameRedactor, pricePerWord, Redactor.Region.SUR_AMERICA);
+                    Redactor newRedactor = new Redactor(nameRedactor, pricePerWord, regionSelect, null);
 
                     addRedactor(newRedactor);
                     break;
@@ -277,8 +271,8 @@ public class Editor implements Consult {
             optionActionsArticle = GestionEditorial.read.nextByte();
             switch (optionActionsArticle) {
                 case 1 -> {
-                    System.out.print("Ingrese el nombre del articulo: ");
-                    String articleName = GestionEditorial.read.nextLine();
+                    System.out.print("Ingrese la keyword del articulo: ");
+                    String keyword = GestionEditorial.read.nextLine();
                     GestionEditorial.read.nextLine();
                     System.out.print("Ingrese el url del articulo: ");                    
                     String articleUrl = GestionEditorial.read.nextLine();
@@ -291,7 +285,7 @@ public class Editor implements Consult {
                         Redactor redactorTpm = searchRedactor(searchedId);
                         Article article = new Article(articleName, articleUrl, redactorTpm, 0, Article.Estado.ASIGNADO);
                         addArticle(article);
-                        //Se ejecuta la función y agrega el artículo a la lista correspondiente
+                        //Se ejecuta la función y agrega el artículo a la lista del redactor correspondiente
                     }else{
                          Article article = new Article(articleName, articleUrl, null, 0, Article.Estado.POR_ASIGNAR);
                          addArticle(article);
@@ -302,17 +296,23 @@ public class Editor implements Consult {
                     
                     if (!listArticles.isEmpty()) {                        
                         showArticles();
-                        System.out.println("Desea consultar un articulo especifico por su ID? s/n");   
+                        System.out.println("Desea consultar un articulo especifico? S/N");   
                         char answer = GestionEditorial.read.next().charAt(0);
-                        if (answer=='s' || answer=='S' ){
-                            System.out.println("ingresa el ID del articulo que deseas consultar: ");
-                            int idToSearch = GestionEditorial.read.nextInt();
-                            showArticle(idToSearch);
-                            
-                        }else if (answer== 'n' || answer== 'N'){
-                        System.out.println("regresando al menu principal");
-                    }else{
-                            System.out.println("opcion no valida");   
+                        answer = Character.toUpperCase(answer);
+                        switch (answer) {
+                            case 'S' -> {
+                                System.out.println("Ingresa el ID del articulo que deseas consultar: ");
+                                int idToSearch = GestionEditorial.read.nextInt();
+                                showArticle(idToSearch);
+                            }
+                            case 'N' -> {
+                                System.out.println("Regresando al menu principal");
+                                break;
+                            }
+                            default -> {
+                                System.out.println("Opcion no valida");
+                                break;
+                            }
                         }
                         
                     } else {
@@ -327,8 +327,10 @@ public class Editor implements Consult {
                     for (Article article : listArticles){
                         if ((article.getRedactor()!= null) && (article.getEstado().equals(Article.Estado.POR_ASIGNAR))){
                             redactorTpm.addArticle(article);
+                            article.setEstado(Article.Estado.ASIGNADO);
+                            article.setRedactor(redactorTpm);
                         } else {
-                            System.out.println(article.getEstado());
+                            System.out.println("El articulo está: " + article.getEstado());
                         }
                     }
                     break;

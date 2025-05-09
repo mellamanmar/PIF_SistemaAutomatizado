@@ -13,6 +13,7 @@ import java.util.Deque;
  */
 public class Redactor implements Consult {
 
+    private static int counter;
     private int redactorId;
     private String redactorName;
     private double pricePerWord;
@@ -20,31 +21,32 @@ public class Redactor implements Consult {
     private Article article;
     Deque<Article> articlesQueue = new ArrayDeque<>();
 
-    enum Region {
+    public enum Region {
         NORTE_AMERICA, CENTRO_AMERICA, SUR_AMERICA, EUROPA, ASIA, AFRICA, OCEANIA
     }
 
-    public Redactor(int redactorId, String redactorName, double pricePerWord, Region region /*, Article article*/) {
-        this.redactorId = redactorId;
+    public Redactor(String redactorName, double pricePerWord, Region region, Article article) {
         this.redactorName = redactorName;
         this.pricePerWord = pricePerWord;
         this.region = region;
-        //this.article = article;
+        this.article = article;
+        this.redactorId = counter;
+        if (counter == 0){
+            counter = 1;
+        } else {
+            counter++;
+        }
     }
 
     @Override
     public String toString() {
-        return "ID: " + redactorId + ", Nombre: " + redactorName;
+        return "ID: " + this.redactorId + "\n Nombre: " + this.redactorName + "\n Precio por palabra: " + this.pricePerWord;
     }
 
     public int getRedactorId() {
         return redactorId;
     }
-
-    public void setRedactorId(int redactorId) {
-        this.redactorId = redactorId;
-    }
-
+    
     public String getRedactorName() {
         return redactorName;
     }
@@ -61,13 +63,13 @@ public class Redactor implements Consult {
         this.pricePerWord = pricePerWord;
     }
 
-//    public Region getRegion() {
-//        return region;
-//    }
-//
-//    public void setRegion(Region region) {
-//        this.region = region;
-//    }
+    public Region getRegion() {
+        return region;
+    }
+
+    public void setRegion(Region region) {
+        this.region = region;
+    }
 
     public Article getArticle() {
         return article;
