@@ -231,15 +231,14 @@ public class Editor implements Consult {
     }
     
     //Para buscar por ID cambiar la url por el ID que ingresa el usuario desde el menu
-    public void showArticle(String url) {
+    public void showArticle(int id) {
         for (Article article : listArticles) {
-            if (!url.equalsIgnoreCase(article.getUrl())) {                
-                System.out.println("No existe ese articulo");
-            } else {
+            if (article.getId()== id) {                
                 System.out.println(article.toString());
-                break;
-            }
+                return;
+            } 
         }
+        System.out.println("No existe el articulo con el id " + id);
     }
     
     public void reviewArticle(Article article){
@@ -268,11 +267,10 @@ public class Editor implements Consult {
         do {
             System.out.print("""
                                1. Agregar articulo.
-                               2. Consultar articulos.
-                               3. Consultar articulo. 
-                               4. Asignar articulo.
-                               5. Revisar articulo
-                               6. Salir.
+                               2. Consultar articulos. 
+                               3. Asignar articulo.
+                               4. Revisar articulo
+                               5. Salir.
                                Seleccione la accion que quiere hacer: """);
             //Verificar las funciones de consultar artículo para integrarlo 
             //con la lista completa de artículos, y tomar por ID el artículo que se quiera consultar
@@ -301,24 +299,28 @@ public class Editor implements Consult {
                     break;
                 }
                 case 2 -> {
+                    
                     if (!listArticles.isEmpty()) {                        
                         showArticles();
+                        System.out.println("Desea consultar un articulo especifico por su ID? s/n");   
+                        char answer = GestionEditorial.read.next().charAt(0);
+                        if (answer=='s' || answer=='S' ){
+                            System.out.println("ingresa el ID del articulo que deseas consultar: ");
+                            int idToSearch = GestionEditorial.read.nextInt();
+                            showArticle(idToSearch);
+                            
+                        }else if (answer== 'n' || answer== 'N'){
+                        System.out.println("regresando al menu principal");
+                    }else{
+                            System.out.println("opcion no valida");   
+                        }
+                        
                     } else {
                         System.out.println("La lista de articulos esta vacia.");
                     }
                     break;
                 }
                 case 3 -> {
-                    if (!listArticles.isEmpty()) {
-                        System.out.print("Ingresa el url del articulo que deseas buscar: ");
-                        String urlToSearch = GestionEditorial.read.nextLine();
-                        showArticle(urlToSearch);
-                    } else {
-                        System.out.println("La lista de articulos esta vacia.");
-                    }
-                    break;
-                }
-                case 4 -> {
                     System.out.println("Ingrese el ID del redactor al que va a asignar el articulo");
                     int idToSearch = GestionEditorial.read.nextInt();
                     Redactor redactorTpm = searchRedactor(idToSearch);
@@ -331,11 +333,11 @@ public class Editor implements Consult {
                     }
                     break;
                 }
-                case 5 ->{
+                case 4 ->{
                     //Revisar la cola de articulos del redactor por estado y cambiar el estado según la revisión
                     break;
                 }
-                case 6 ->{
+                case 5 ->{
                     break;
                 }
                 default ->
@@ -343,6 +345,6 @@ public class Editor implements Consult {
 
             }//end switch for Actions whit Articles}
 
-        } while (optionActionsArticle != 6);
+        } while (optionActionsArticle != 5);
     }
 }
