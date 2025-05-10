@@ -20,7 +20,8 @@ public class Article {
         COMPLETADO,
         CORREGIDO,
         DEVUELTO,
-        PUBLICADO
+        PUBLICADO,
+        PRUEBA
     }
 
     public Article(String keyword, Redactor redactor, Estado estado) {
