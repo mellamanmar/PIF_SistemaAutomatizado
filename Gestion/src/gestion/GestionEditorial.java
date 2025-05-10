@@ -5,6 +5,7 @@
 package gestion;
 
 import java.util.Scanner;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -12,8 +13,8 @@ import java.util.Scanner;
  */
 public class GestionEditorial {
     public static final Scanner read = new Scanner(System.in);
-    static final Redactor redactor = new Redactor("Simon", 0, Redactor.Region.EUROPA, null);
-    static final Editor editor = new Editor("simon", 123);
+    public static Redactor redactor = new Redactor();
+    public Editor editor = new Editor();
     byte option = 0;
     
     //Busca redactores en la lista del editor
@@ -27,17 +28,14 @@ public class GestionEditorial {
     //Menú principal
     public void mainMenu() {
         do {
-            System.out.println("""
-                             
+            option = Byte.parseByte(JOptionPane.showInputDialog("""
                                1. Redactor.
                                2. Editor.
                                0. Salir del programa.
-                               Seleccione su usuario: """);
-            option = read.nextByte();
+                               Seleccione su usuario: """));
             switch (option) {
                 case 1 -> {
-                    System.out.println("Ingrese su ID:");
-                    int idToSearch = read.nextInt();
+                    int idToSearch = Integer.parseInt(JOptionPane.showInputDialog("Ingrese su ID:"));
                     // Utiliza la función searchRedactors para buscar
                     if (searchRedactors(idToSearch)){                        
                         redactor.menuOptions();

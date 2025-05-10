@@ -6,9 +6,8 @@ package gestion;
 
 
 public class Article {
-// Agregar un ID que se autoincremente solo size()+1 
-    private static int counter;
-    private int id;
+    private static int counter = 1;
+    private int articleId;
     private String keyword;
     private String url;
     private Redactor redactor;
@@ -24,24 +23,11 @@ public class Article {
         PUBLICADO
     }
 
-    public Article(String keyword, String url, Redactor redactor, int numPalabras, Estado estado) {
+    public Article(String keyword, Redactor redactor, Estado estado) {
         this.keyword = keyword;
         this.redactor = redactor;
         this.estado = estado;
-        this.id = counter;
-        if (counter == 0){
-            counter = 1;
-        } else {
-            counter++;
-        }
-    }
-    
-    private static void incrementCounter(){
-        if (counter == 0){
-            counter = 1;
-        } else {
-            counter++;
-        }
+        this.articleId = counter++; 
     }
     
     
@@ -50,20 +36,21 @@ public class Article {
         return "Keyword del artículo: "+this.keyword + "\n URL: "+ this.url +  "\n Palabras: " + numPalabras +
                 "\n Estado: " + this.estado + "\n Redactor: " + (redactor != null ? redactor.getRedactorName() : "Sin asignar");
     }
+
+    public int getArticleId() {
+        return articleId;
+    }
+
+    public void setArticleId(int articleId) {
+        this.articleId = articleId;
+    }
+
     public String getKeyword() {
         return keyword;
     }
 
     public void setKeyword(String keyword) {
         this.keyword = keyword;
-    }
-    
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getUrl() {
@@ -97,7 +84,10 @@ public class Article {
     public void setEstado(Estado estado) {
         this.estado = estado;
     }
+ 
     
+    
+
     
 
 }

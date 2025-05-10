@@ -13,7 +13,7 @@ import java.util.Deque;
  */
 public class Redactor implements Consult {
 
-    private static int counter;
+    public static int counter = 1;
     private int redactorId;
     private String redactorName;
     private double pricePerWord;
@@ -25,22 +25,20 @@ public class Redactor implements Consult {
         NORTE_AMERICA, CENTRO_AMERICA, SUR_AMERICA, EUROPA, ASIA, AFRICA, OCEANIA
     }
 
-    public Redactor(String redactorName, double pricePerWord, Region region, Article article) {
+    public Redactor(String redactorName, double pricePerWord, Region region) {
         this.redactorName = redactorName;
         this.pricePerWord = pricePerWord;
         this.region = region;
-        this.article = article;
-        this.redactorId = counter;
-        if (counter == 0){
-            counter = 1;
-        } else {
-            counter++;
-        }
+        this.redactorId = counter++;
+    }
+    
+    public Redactor (){
+        
     }
 
     @Override
     public String toString() {
-        return "ID: " + this.redactorId + "\n Nombre: " + this.redactorName + "\n Precio por palabra: " + this.pricePerWord;
+        return "ID: " + this.redactorId + "\n Nombre: " + this.redactorName + "\n Precio por palabra: " + this.pricePerWord + "\n Vive en: " + this.region;
     }
 
     public int getRedactorId() {
@@ -83,7 +81,9 @@ public class Redactor implements Consult {
         articlesQueue.offer(article);
     }
     
-    //Función que cambie el estado a COMPLETADO y envíe el articulo a la lista general del editor
+    public void completedArticles(Article article){
+        article.setEstado(Article.Estado.COMPLETADO);
+    }
     
     public void removeArticle (Article article){
         articlesQueue.remove(article);

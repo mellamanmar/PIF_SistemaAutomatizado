@@ -18,6 +18,8 @@ public class Gestion {
         GestionEditorial gestion = new GestionEditorial();
         gestion.mainMenu();
         
+        System.out.println(Redactor.counter);
+        
     }
 
 }
