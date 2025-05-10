@@ -19,7 +19,8 @@ public class Article {
         COMPLETADO,
         CORREGIDO,
         DEVUELTO,
-        PUBLICADO
+        PUBLICADO,
+        PRUEBA
     }
 
     public Article(String titulo, String url, Redactor redactor, int numPalabras, Estado estado) {
