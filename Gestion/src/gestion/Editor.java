@@ -209,7 +209,6 @@ public class Editor implements Consult {
         }
     }
 
-    //Para buscar por ID cambiar la url por el ID que ingresa el usuario desde el menu
     public Article showArticle(int id) {
         for (Article article : listArticles) {
             if (article.getArticleId() == id) {
