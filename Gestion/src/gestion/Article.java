@@ -6,7 +6,7 @@ package gestion;
 
 
 public class Article {
-    private static int counter = 1;
+    private static int counter;
     private int articleId;
     private String keyword;
     private String url;
@@ -25,10 +25,15 @@ public class Article {
     }
 
     public Article(String keyword, Redactor redactor, Estado estado) {
+        if (counter == 0){
+            counter = 1;
+        }else {
+            counter++;
+        }
         this.keyword = keyword;
         this.redactor = redactor;
         this.estado = estado;
-        this.articleId = counter++; 
+        this.articleId = counter; 
     }
     
     

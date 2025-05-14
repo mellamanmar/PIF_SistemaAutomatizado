@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package gestion;
 
 import java.util.ArrayList;
@@ -9,15 +5,18 @@ import javax.swing.*;
 
 public class Editor implements Consult {
 
+    private static int counter;
     private String editorName;
     private int editorId;
 
-    public Editor(String editorName, int editorId) {
+    public Editor(String editorName) {
+        if (counter == 0) {
+            counter = 1;
+        } else {
+            counter++;
+        }
         this.editorName = editorName;
-        this.editorId = editorId;
-    }
-    
-    public Editor(){
+        this.editorId = counter;
     }
 
     public String getEditorName() {
@@ -53,29 +52,30 @@ public class Editor implements Consult {
         for (Redactor redactor : listRedactors) {
             System.out.println(redactor);
         }
+        System.out.println("------------------");
     }
 
     public void showRedactor(int id) {
+        boolean find = false;
         for (Redactor redactor : listRedactors) {
             if (id == redactor.getRedactorId()) {
                 System.out.println(redactor);
+                find = true;
                 break;
-            } else {
-                System.out.println("No existe ese redactor");
             }
         }
-
+        if (!find) {
+            System.out.println("No existe ese redactor");
+        }
     }
 
     public Redactor searchRedactor(int id) {
         for (Redactor redactor : listRedactors) {
             if (id == redactor.getRedactorId()) {
                 return redactor;
-            } else {
-
-                System.out.println("No existe ese redactor");
             }
         }
+        System.out.println("No existe ese redactor");
         return null;
     }
 
@@ -136,7 +136,7 @@ public class Editor implements Consult {
                                3. Consultar redactores.
                                4. Consultar redactor.
                                5. Salir.
-                               """));
+                               """)); //Revisar el id de los redactores cuando se crean
             switch (optionActionsRedactor) {
 
                 case 1 -> {
@@ -158,12 +158,12 @@ public class Editor implements Consult {
                         int idToRemove = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el ID del redactor que deseas eliminar: "));
 
                         if (removeRedactor(idToRemove)) {
-                            System.out.print("Redactor eliminado con exito.");
+                            System.out.println("Redactor eliminado con exito.");
                         } else {
-                            System.out.print("No se encontro un redactor con ese ID.");
+                            System.out.println("No se encontro un redactor con ese ID.");
                         }
                     } else {
-                        System.out.print("La lista de redactores esta vacia.");
+                        System.out.println("La lista de redactores esta vacia.");
                     }
 
                 }
@@ -171,21 +171,28 @@ public class Editor implements Consult {
                     if (!listRedactors.isEmpty()) {
                         showRedactors();
                     } else {
-                        System.out.print("La lista de redactores esta vacia.");
+                        System.out.println("La lista de redactores esta vacia.");
                     }
                 }
                 case 4 -> {
+                    Object[] redactors = listRedactors.toArray();
+
                     if (!listRedactors.isEmpty()) {
-                        int idToSearch = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el ID del redactor que deseas buscar: "));
-                        showRedactor(idToSearch);
+                        Redactor selectedRedactor = (Redactor) JOptionPane.showInputDialog(null, "Seleccione el redactor a consultar",
+                                "Redatores", JOptionPane.QUESTION_MESSAGE, null,
+                                redactors, redactors[0]);
+
+                        if (selectedRedactor != null) {
+                            selectedRedactor.showArticlesRedactor();
+                        }
                     } else {
-                        System.out.print("La lista de redactores esta vacia.");
+                        System.out.println("La lista de redactores esta vacia.");
                     }
                 }
                 case 5 -> {
                 }
                 default ->
-                    System.out.print("Error en la opcion");
+                    System.out.println("Error en la opcion");
 
             }//end switch for Actions whit redactor
         } while (optionActionsRedactor != 5);
@@ -193,7 +200,7 @@ public class Editor implements Consult {
 
     public void addArticleToList(Article article) {
         if (article.getRedactor() != null) {
-            GestionEditorial.redactor.addArticle(article);
+            article.getRedactor().addArticle(article);
         } else {
             listArticles.add(article);
         }
@@ -207,12 +214,12 @@ public class Editor implements Consult {
         for (Article article : listArticles) {
             System.out.println("ID: " + article.getArticleId() + "\n Palabra clave: " + article.getKeyword());
         }
+        System.out.println("------------------------");
     }
 
     public Article showArticle(int id) {
         for (Article article : listArticles) {
             if (article.getArticleId() == id) {
-                System.out.println(article);
                 return article;
             }
         }
@@ -223,31 +230,33 @@ public class Editor implements Consult {
     public Article asignArticle(Redactor redactor) {
         for (Article article : listArticles) {
             if ((article.getRedactor() == null) && (article.getEstado().equals(Article.Estado.POR_ASIGNAR))) {
-                article.setRedactor(redactor); // asignas el redactor al artículo
-                article.setEstado(Article.Estado.ASIGNADO); // cambias el estado a ASIGNADO
-                redactor.addArticle(article);
+                article.setRedactor(redactor); // Se asigna el redactor al artículo
+                article.setEstado(Article.Estado.ASIGNADO); // Se cambia el estado a ASIGNADO
+                redactor.addArticle(article); // Asigna el artículo a la cola del redactor
                 return article;
-            } else {
-                JOptionPane.showMessageDialog(null, "El articulo está: " + article.getEstado());
             }
         }
+        JOptionPane.showMessageDialog(null, "No hay artículos por asignar");
         return null;
     }
 
-    public void reviewArticle(Article article) {
+    public void reviewArticle(Article article, Redactor redactor) {
+        System.out.println("DEBUG...");
         article.setEstado(Article.Estado.CORREGIDO);
         //Debe eliminar desde el objeto
-        GestionEditorial.redactor.removeArticle(article);
+        redactor.removeArticle(article);
     }
 
-    public void returnArticle(Article article) {
+    public void returnArticle(Article article, Redactor redactor) {
+        System.out.println("DEBUG...");
         article.setEstado(Article.Estado.DEVUELTO);
         //La función debe enviar y eliminar el artículo de la cola de cada redactor
-        GestionEditorial.redactor.addArticle(article);
+        redactor.addArticle(article);
         removeArticle(article);
     }
 
     public void publishArticle(Article article) {
+        System.out.println("DEBUG...");
         article.setEstado(Article.Estado.PUBLICADO);
         listPublishArticles.add(article); //Función el editor que agrega a la lista de artículos publicados
         removeArticle(article); //Función del editor que quita los artículos de la cola general
@@ -271,20 +280,26 @@ public class Editor implements Consult {
                 case 1 -> {
                     String newKeyword = JOptionPane.showInputDialog("Ingrese la keyword del articulo: ");
 
-                    int searchedRedactorId = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el ID del redactor que va escribir este articulo o -1. si no tiene redactor asignado: "));
-                    if (searchedRedactorId != -1) {
+                    int response = JOptionPane.showConfirmDialog(
+                            null,
+                            "¿Deseas asignar un redactor al artículo?",
+                            "Asignar Redactor",
+                            JOptionPane.YES_NO_OPTION
+                    );
+                    Redactor selectedRedactor = null;
 
-                        Redactor redactorTpm = searchRedactor(searchedRedactorId);
-                        Article newArticle = new Article(newKeyword, redactorTpm, Article.Estado.ASIGNADO);
-                        addArticleToList(newArticle);
-                        System.out.println("Artículo " + newArticle.getArticleId() + " creado");
-                        //Busca al redactor, crea el artículo y lo agrega a la lista del redactor correspondiente
-                    } else {
-                        Article newArticle = new Article(newKeyword, null, Article.Estado.POR_ASIGNAR);
-                        addArticleToList(newArticle);
-                        System.out.println("Artículo " + newArticle.getArticleId() + " creado");//Si no tiene redactor lo deja en la lista de artículos generales
+                    if (response == JOptionPane.YES_OPTION && !listRedactors.isEmpty()) {
+
+                        Redactor[] redactorsListTmp = listRedactors.toArray(Redactor[]::new);
+                        selectedRedactor = (Redactor) JOptionPane.showInputDialog(null, "Selecciona un redactor para revisar sus artículos:", "Redactores",
+                                JOptionPane.QUESTION_MESSAGE, null, redactorsListTmp, redactorsListTmp[0]);
                     }
-
+                    System.out.println(selectedRedactor);// Probar si toma el redactor
+                    Article.Estado newEstado = (selectedRedactor != null) ? Article.Estado.ASIGNADO : Article.Estado.POR_ASIGNAR;
+                    Article newArticle = new Article(newKeyword, selectedRedactor, newEstado);
+                    addArticleToList(newArticle);
+                    System.out.println(newArticle);// Probar si crea el artículo
+                    System.out.println("Articulo " + newArticle.getArticleId() + " creado");
                 }
                 case 2 -> {
 
@@ -295,7 +310,7 @@ public class Editor implements Consult {
                         switch (Character.toUpperCase(answer)) {
                             case 'S' -> {
                                 int idToSearch = Integer.parseInt(JOptionPane.showInputDialog("Ingresa el ID del articulo que deseas consultar: "));
-                                showArticle(idToSearch);
+                                System.out.println(showArticle(idToSearch));
                             }
                             case 'N' -> {
                                 JOptionPane.showMessageDialog(null, "Regresando al menu principal");
@@ -313,22 +328,60 @@ public class Editor implements Consult {
                     break;
                 }
                 case 3 -> {
-                    int idToSearch = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el ID del redactor al que va a asignar el articulo"));
-                    Redactor redactorTpm = searchRedactor(idToSearch);
-                    asignArticle(redactorTpm);
-                }            
-                
-                case 4 -> {
-                    int idForReview = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el ID del articulo que quiere revisar"));
-                    Article articleForReview = showArticle(idForReview);
-                    
-                    if ((articleForReview.getNumPalabras() <= 2500) && (newArticle.getEstado().equals(Article.Estado.COMPLETADO))) {
-                        reviewArticle(newArticle);
-                    } else if (newArticle.getNumPalabras() > 3000 && (newArticle.getEstado().equals(Article.Estado.COMPLETADO))) {
-                        returnArticle(newArticle);
+                    if (listArticles.isEmpty()) {
+                        JOptionPane.showMessageDialog(null, "No hay artículos disponibles para asignar.");
+                        break;
                     }
-                    //Revisar la cola de articulos del redactor por estado y cambiar el estado según la revisión
-                    break;
+                    if (listRedactors.isEmpty()) {
+                        JOptionPane.showMessageDialog(null, "No hay redactores registrados para asignar artículos.");
+                        break;
+                    }
+                    // Busca los artículos en la lista del editor
+                    Article[] articlesListTmp = listArticles.toArray(Article[]::new);
+                    Article articleForAssign = (Article) JOptionPane.showInputDialog(null, "Selecciona un artículo para asignar:", "Artículos",
+                            JOptionPane.QUESTION_MESSAGE, null, articlesListTmp, articlesListTmp.length > 0 ? articlesListTmp[0] : null);
+                    if (articleForAssign == null) {
+                        break;
+                    }
+
+                    // Busca todos los redactores 
+                    Redactor[] redactorsListTmp = listRedactors.toArray(Redactor[]::new);
+                    Redactor selectedRedactor = (Redactor) JOptionPane.showInputDialog(null, "Selecciona un redactor para asignar el artículo:", "Redactores",
+                            JOptionPane.QUESTION_MESSAGE, null, redactorsListTmp, redactorsListTmp.length > 0 ? redactorsListTmp[0].getRedactorName() : null);
+                    if (selectedRedactor == null) {
+                        break;
+                    }
+
+                    articleForAssign.setEstado(Article.Estado.ASIGNADO); // Cambia el estado del artículo seleccionado
+                    System.out.println(articleForAssign.getEstado()); // Imprime el estado para verificar
+                    selectedRedactor.addArticle(articleForAssign); // Agrega a la lista del redactor
+                    JOptionPane.showMessageDialog(null, "Artículo asignado correctamente al redactor " + selectedRedactor.getRedactorName());
+                    listArticles.remove(articleForAssign); // Luego lo elimina de la lista del editor
+                }
+
+                case 4 -> {
+                    // Busca el redactor de interés
+                    Redactor[] redactorsListTmp = listRedactors.toArray(Redactor[]::new);
+                    Redactor selectedRedactor = (Redactor) JOptionPane.showInputDialog(null, "Selecciona un redactor para revisar sus artículos:", "Redactores",
+                            JOptionPane.QUESTION_MESSAGE, null, redactorsListTmp, redactorsListTmp.length > 0 ? redactorsListTmp[0].getRedactorName() : null);
+                    if (selectedRedactor != null) {
+
+                        selectedRedactor.showArticlesRedactor(); //Muestra todos los artículos en la cola del redactor
+                        
+                        // Muestra la lista de los artículos de la cola del redactor en cuestión
+                        Article[] articlesListTmp = selectedRedactor.articlesQueue.toArray(Article[]::new);
+                        Article articleForReview = (Article) JOptionPane.showInputDialog(null, "Selecciona un artículo para asignar:", "Artículos",
+                                JOptionPane.QUESTION_MESSAGE, null, articlesListTmp, articlesListTmp.length > 0 ? articlesListTmp[0] : null);
+
+//                        int idForReview = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el ID del artículo que quiere revisar"));
+//                        Article articleForReview = selectedRedactor.showArticle(idForReview); //Muestra la información del artículo seleccionado
+                        if ((articleForReview.getNumPalabras() <= 2500) && (articleForReview.getEstado().equals(Article.Estado.COMPLETADO))) {
+                            reviewArticle(articleForReview, selectedRedactor);
+                        } else if (articleForReview.getNumPalabras() > 3000 && (articleForReview.getEstado().equals(Article.Estado.COMPLETADO))) {
+                            returnArticle(articleForReview, selectedRedactor);
+                        }
+                    }
+                    //Revisa la cola de articulos del redactor por estado y cambiar el estado según la revisión
                 }
                 case 5 -> {
                     break;
@@ -338,9 +391,7 @@ public class Editor implements Consult {
 
             }//end switch for Actions whit Articles}
 
-        
-    }
-    while (optionActionsArticle 
-!= 5);
+        } while (optionActionsArticle
+                != 5);
     }
 }

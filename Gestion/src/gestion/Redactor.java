@@ -14,7 +14,7 @@ import javax.swing.JOptionPane;
  */
 public class Redactor implements Consult {
 
-    public static int counter = 1;
+    public static int counter;
     private int redactorId;
     private String redactorName;
     private double pricePerWord;
@@ -27,10 +27,15 @@ public class Redactor implements Consult {
     }
 
     public Redactor(String redactorName, double pricePerWord, Region region) {
+        if (counter == 0) {
+            counter = 1;
+        } else {
+            counter++;
+        }
         this.redactorName = redactorName;
         this.pricePerWord = pricePerWord;
         this.region = region;
-        this.redactorId = counter++;
+        this.redactorId = counter;
     }
 
     public Redactor() {
@@ -39,7 +44,11 @@ public class Redactor implements Consult {
 
     @Override
     public String toString() {
-        return "ID: " + this.redactorId + "\n Nombre: " + this.redactorName + "\n Precio por palabra: " + this.pricePerWord + "\n Vive en: " + this.region;
+        return this.redactorName;
+    }
+    
+    public String redactorInfo(){
+        return "ID: " + getRedactorId() + "\nNombre " + getRedactorName() + "\nPrecio por palabra " + getPricePerWord() + "\n Vive en: " + getRegion();
     }
 
     public int getRedactorId() {
@@ -79,7 +88,8 @@ public class Redactor implements Consult {
     }
 
     public void addArticle(Article article) {
-        articlesQueue.offer(article);
+        article.setEstado(Article.Estado.ASIGNADO);
+        articlesQueue.offerLast(article);
     }
 
     public void completedArticles(Article article) {
@@ -89,25 +99,40 @@ public class Redactor implements Consult {
     public void removeArticle(Article article) {
         articlesQueue.remove(article);
     }
-
+// Hay que arreglar cómo se muestran, de esta manera no se muestra nada
     public void showArticlesRedactor() {
+        StringBuilder assigned = new StringBuilder ("ARTÍCULOS ASIGNADOS:\n");
+        StringBuilder completed = new StringBuilder ("ARTÍCULOS COMPLETADOS:\n");
+        boolean hasAssigned = false;
+        boolean hasCompleted = false;
+        
         if (!articlesQueue.isEmpty()) {
             for (Article redactorArticle : articlesQueue) {
-                if (redactorArticle.getEstado().equals(Article.Estado.ASIGNADO)) {
-                    System.out.println("ID: " + redactorArticle.getArticleId() + "\nPalabra clave: " + redactorArticle.getKeyword() + "\nEstado: " + redactorArticle.getEstado());
-                } else if (redactorArticle.getEstado().equals(Article.Estado.COMPLETADO)) {
-                    System.out.println("ID: " + redactorArticle.getArticleId() + "\nPalabra clave: " + redactorArticle.getKeyword() + "\nEstado: " + redactorArticle.getEstado());
+                if (redactorArticle.getEstado() == (Article.Estado.ASIGNADO)) {
+                    hasAssigned = true;
+                    assigned.append("ID: ").append(redactorArticle.getArticleId()).append(" | Palabra clave: ").append(redactorArticle.getKeyword()).append("\n");
+                    
+                } else if (redactorArticle.getEstado() == (Article.Estado.COMPLETADO)) {
+                    hasCompleted = true;
+                    completed.append("ID: ").append(redactorArticle.getArticleId()).append(" | Palabra clave: ").append(redactorArticle.getKeyword()).append("\n");
                 }
             }
+            StringBuilder resultArticles = new StringBuilder("--------------------------\n");
+            
+            if (hasAssigned) resultArticles.append(assigned).append("\n");
+            if (hasCompleted) resultArticles.append(completed);
+                
+        } else {
+            JOptionPane.showMessageDialog(null, "No tiene artículos en la cola");
         }
-        JOptionPane.showMessageDialog(null, "No tiene artículos asignados");
+
     }
 
     public Article showArticle(int id) {
         for (Article redactorArticle : articlesQueue) {
             if (redactorArticle.getArticleId() == id) {
-                System.out.println(article);
-                return article;
+                System.out.println(redactorArticle);
+                return redactorArticle;
             }
         }
         System.out.println("No existe el articulo con el id " + id);
@@ -120,37 +145,45 @@ public class Redactor implements Consult {
         byte optionRedactor = 0;
         do {
             optionRedactor = Byte.parseByte(JOptionPane.showInputDialog("""
-                            1. Consultar articulos pendientes.
-                            2. Consultar artículos completados.
-                            3. Modificar ESTADO de articulo.
-                            4. Ver reporte de mes.
-                            5. Salir.
+                            1. Consultar artÍculos.
+                            2. Modificar ESTADO de articulo.
+                            3. Ver reporte de mes.
+                            4. Salir.
                             Seleccione la accion que quiere hacer: """));
             switch (optionRedactor) {
+
                 case 1 -> {
+                    System.out.println("Redactor actual: ID " + this.redactorId + " - Artículos en cola: " + articlesQueue.size());
                     showArticlesRedactor();
                 }
                 case 2 -> {
-                    showArticlesRedactor();
-                }
-                case 3 -> {
                     int idTmp = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el id del artículo que desea consultar"));
                     Article redactorArticle = showArticle(idTmp);
-                    Article.Estado estadoSelect = (Article.Estado) JOptionPane.showInputDialog(null, "Seleccione el estado por cambiar", "Opciones",
-                            JOptionPane.OK_OPTION, null, estado, estado[0]);
-                    redactorArticle.setEstado(estadoSelect);
-                    JOptionPane.showMessageDialog(null, "El estado del artículo " + redactorArticle.getArticleId() + " se cambió a " + redactorArticle.getEstado());
-                }
-                case 4 -> {
+                    if (redactorArticle != null) {
+                        Article.Estado estadoSelect = (Article.Estado) JOptionPane.showInputDialog(null, "Seleccione el estado por cambiar", "Opciones",
+                                JOptionPane.YES_OPTION, null, estado, estado[0]);
+                        int newNumWords = Integer.parseInt(JOptionPane.showInputDialog("¿De cuántas palabras fue su artículo?"));
+                        redactorArticle.setNumPalabras(newNumWords);
+                        redactorArticle.setEstado(estadoSelect);
+                        JOptionPane.showMessageDialog(null, "El estado del artículo " + redactorArticle.getArticleId() + " se cambió a " + redactorArticle.getEstado());
+                        break;
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Artículo no encontrado.");
+                        break;
+                    }
 
                 }
-                case 5 -> {
+                case 3 -> {
+
+                }
+                case 4 -> {
+                    break;
                 }
                 default ->
                     System.out.println("Error en la opcion");
 
             } // end switch for user redactor
-        } while (optionRedactor != 5);
+        } while (optionRedactor != 4);
     }
 
 }

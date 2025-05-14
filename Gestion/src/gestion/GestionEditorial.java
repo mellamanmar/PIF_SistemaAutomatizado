@@ -13,17 +13,20 @@ import javax.swing.JOptionPane;
  */
 public class GestionEditorial {
     public static final Scanner read = new Scanner(System.in);
-    public static Redactor redactor = new Redactor();
-    public Editor editor = new Editor();
+    public static Editor editor = new Editor("Editor1");
     byte option = 0;
     
     //Busca redactores en la lista del editor
-    public boolean searchRedactors(int id) {
+    public Redactor searchRedactors(int id) {
         for (Redactor redactor : editor.listRedactors) {
-            return id == redactor.getRedactorId();      
+            if (redactor.getRedactorId()==id){
+                return redactor; 
+            }    
         }
-        return false;
+        return null;
     }
+    
+    
     
     //Menú principal
     public void mainMenu() {
@@ -36,11 +39,12 @@ public class GestionEditorial {
             switch (option) {
                 case 1 -> {
                     int idToSearch = Integer.parseInt(JOptionPane.showInputDialog("Ingrese su ID:"));
-                    // Utiliza la función searchRedactors para buscar
-                    if (searchRedactors(idToSearch)){                        
-                        redactor.menuOptions();
-                    }else{
-                        System.out.println("No existe ese redactor");
+                    Redactor redactorFound = searchRedactors(idToSearch); // Utiliza la función searchRedactors para buscar
+                    
+                    if (redactorFound != null){
+                        redactorFound.menuOptions();
+                    } else {
+                        JOptionPane.showMessageDialog(null, "No existe un redactor con ese ID.");
                     }
                     
                     break;
