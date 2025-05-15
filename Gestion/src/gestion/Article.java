@@ -11,7 +11,7 @@ public class Article {
     private String keyword;
     private String url;
     private Redactor redactor;
-    private int numPalabras;
+    private int wordNums;
     private Estado estado;
 
     public enum Estado {
@@ -39,8 +39,8 @@ public class Article {
     
     @Override
     public String toString(){
-        return "Keyword del artículo: "+this.keyword + "\n URL: "+ this.url +  "\n Palabras: " + numPalabras +
-                "\n Estado: " + this.estado + "\n Redactor: " + (redactor != null ? redactor.getRedactorName() : "Sin asignar");
+        return "-ID: " + this.getArticleId()+ "\n-Keyword del artículo: "+this.getKeyword() + "\n-Palabras: " + this.getWordNums() +
+                "\n-Estado: " + this.getEstado() + "\n-Redactor: " + (redactor != null ? redactor.getRedactorName() : "Sin asignar");
     }
 
     public int getArticleId() {
@@ -75,12 +75,12 @@ public class Article {
         this.redactor = redactor;
     }
 
-    public int getNumPalabras() {
-        return numPalabras;
+    public int getWordNums() {
+        return wordNums;
     }
 
-    public void setNumPalabras(int numPalabras) {
-        this.numPalabras = numPalabras;
+    public void setWordNums(int wordNums) {
+        this.wordNums = wordNums;
     }
 
     public Estado getEstado() {

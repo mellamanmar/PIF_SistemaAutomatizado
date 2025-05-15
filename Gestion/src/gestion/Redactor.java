@@ -44,11 +44,11 @@ public class Redactor implements Consult {
 
     @Override
     public String toString() {
-        return this.redactorName;
+        return "ID: " + this.getRedactorId() + " - " + this.redactorName;
     }
-    
-    public String redactorInfo(){
-        return "ID: " + getRedactorId() + "\nNombre " + getRedactorName() + "\nPrecio por palabra " + getPricePerWord() + "\n Vive en: " + getRegion();
+
+    public String redactorInfo() {
+        return "ID: " + getRedactorId() + "\nNombre " + getRedactorName() + "\nPrecio por palabra " + getPricePerWord() + "\nVive en: " + getRegion();
     }
 
     public int getRedactorId() {
@@ -92,36 +92,54 @@ public class Redactor implements Consult {
         articlesQueue.offerLast(article);
     }
 
-    public void completedArticles(Article article) {
+    public void completedArticles(Article article, int numWords, Editor editor) {
+        article.setWordNums(numWords);
         article.setEstado(Article.Estado.COMPLETADO);
+        GestionEditorial.editor.listArticles.add(article);
     }
 
     public void removeArticle(Article article) {
         articlesQueue.remove(article);
     }
-// Hay que arreglar cómo se muestran, de esta manera no se muestra nada
+
     public void showArticlesRedactor() {
-        StringBuilder assigned = new StringBuilder ("ARTÍCULOS ASIGNADOS:\n");
-        StringBuilder completed = new StringBuilder ("ARTÍCULOS COMPLETADOS:\n");
-        boolean hasAssigned = false;
-        boolean hasCompleted = false;
-        
+        StringBuilder assigned = new StringBuilder("ARTÍCULOS ASIGNADOS:\n");
+        StringBuilder completed = new StringBuilder("ARTÍCULOS COMPLETADOS:\n");
+        StringBuilder returned = new StringBuilder("ARTÍCULOS DEVUELTOS:\n");
+        boolean hasAssigned, hasCompleted, hasReturned = false;
+        StringBuilder resultArticles = new StringBuilder("--------------------------\n");
+
         if (!articlesQueue.isEmpty()) {
             for (Article redactorArticle : articlesQueue) {
-                if (redactorArticle.getEstado() == (Article.Estado.ASIGNADO)) {
-                    hasAssigned = true;
-                    assigned.append("ID: ").append(redactorArticle.getArticleId()).append(" | Palabra clave: ").append(redactorArticle.getKeyword()).append("\n");
-                    
-                } else if (redactorArticle.getEstado() == (Article.Estado.COMPLETADO)) {
-                    hasCompleted = true;
-                    completed.append("ID: ").append(redactorArticle.getArticleId()).append(" | Palabra clave: ").append(redactorArticle.getKeyword()).append("\n");
+                if (null != redactorArticle.getEstado()) {
+                    switch (redactorArticle.getEstado()) {
+                        case ASIGNADO -> {
+                            hasAssigned = true;
+                            assigned.append("ID: ").append(redactorArticle.getArticleId()).append(" | Palabra clave: ").append(redactorArticle.getKeyword()).append("\n");
+                            if (hasAssigned) {
+                                resultArticles.append(assigned).append("\n");
+                            }
+                        }
+                        case COMPLETADO -> {
+                            hasCompleted = true;
+                            completed.append("ID: ").append(redactorArticle.getArticleId()).append(" | Palabra clave: ").append(redactorArticle.getKeyword()).append("\n");
+                            if (hasCompleted) {
+                                resultArticles.append(completed);
+                            }
+                        }
+                        case DEVUELTO -> {
+                            hasReturned = true;
+                            returned.append("ID: ").append(redactorArticle.getArticleId()).append(" | Palabra clave: ").append(redactorArticle.getKeyword()).append("\n");
+                            if (hasReturned) {
+                                resultArticles.append(returned);
+                            }
+                        }
+                        default -> {
+                        }
+                    }
                 }
             }
-            StringBuilder resultArticles = new StringBuilder("--------------------------\n");
-            
-            if (hasAssigned) resultArticles.append(assigned).append("\n");
-            if (hasCompleted) resultArticles.append(completed);
-                
+            System.out.println(resultArticles.toString());
         } else {
             JOptionPane.showMessageDialog(null, "No tiene artículos en la cola");
         }
@@ -142,48 +160,72 @@ public class Redactor implements Consult {
     @Override
     public void menuOptions() {
         Article.Estado[] estado = {Article.Estado.COMPLETADO};
-        byte optionRedactor = 0;
+        String optionRedactor = "";
         do {
-            optionRedactor = Byte.parseByte(JOptionPane.showInputDialog("""
+            optionRedactor = JOptionPane.showInputDialog("""
                             1. Consultar artÍculos.
-                            2. Modificar ESTADO de articulo.
+                            2. Modificar un artículo.
                             3. Ver reporte de mes.
                             4. Salir.
-                            Seleccione la accion que quiere hacer: """));
+                            Seleccione la accion que quiere hacer: """);
+            if (optionRedactor == null || optionRedactor.isBlank()) {
+                break;
+            }
             switch (optionRedactor) {
 
-                case 1 -> {
-                    System.out.println("Redactor actual: ID " + this.redactorId + " - Artículos en cola: " + articlesQueue.size());
-                    showArticlesRedactor();
+                case "1" -> {
+                    try {
+                        System.out.println("Redactor actual: ID " + this.redactorId + " - Artículos en cola: " + articlesQueue.size());
+                        JOptionPane.showMessageDialog(null, "Ingresando a los artículos ASIGNADOS");
+
+                        //¿MOSTRARLOS TODOS?
+                        showArticlesRedactor();
+                    } catch (Exception e) {
+                        System.out.println("No le logró mostrar los artículos asignados" + e);
+                    }
+                    break;
                 }
-                case 2 -> {
-                    int idTmp = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el id del artículo que desea consultar"));
-                    Article redactorArticle = showArticle(idTmp);
-                    if (redactorArticle != null) {
-                        Article.Estado estadoSelect = (Article.Estado) JOptionPane.showInputDialog(null, "Seleccione el estado por cambiar", "Opciones",
-                                JOptionPane.YES_OPTION, null, estado, estado[0]);
-                        int newNumWords = Integer.parseInt(JOptionPane.showInputDialog("¿De cuántas palabras fue su artículo?"));
-                        redactorArticle.setNumPalabras(newNumWords);
-                        redactorArticle.setEstado(estadoSelect);
-                        JOptionPane.showMessageDialog(null, "El estado del artículo " + redactorArticle.getArticleId() + " se cambió a " + redactorArticle.getEstado());
-                        break;
+
+                case "2" -> {
+                    if (!articlesQueue.isEmpty()) {
+                        try {
+                            Article[] articlesListTmp = articlesQueue.toArray(Article[]::new);
+                            Article redactorArticle = (Article) JOptionPane.showInputDialog(null, "Selecciona un artículo para modificar:", "Artículos",
+                                    JOptionPane.QUESTION_MESSAGE, null, articlesListTmp, articlesListTmp.length > 0 ? articlesListTmp[0] : null);
+
+                            System.out.println(redactorArticle);
+
+                            int newNumWords = Integer.parseInt(JOptionPane.showInputDialog("¿De cuántas palabras fue su artículo?"));
+
+                            if (redactorArticle != null) {
+                                Article.Estado estadoSelect = (Article.Estado) JOptionPane.showInputDialog(null, "Seleccione el estado por cambiar", "Opciones",
+                                        JOptionPane.YES_OPTION, null, estado, estado[0]);
+                                if (estadoSelect != null) {
+                                    completedArticles(redactorArticle, newNumWords, GestionEditorial.editor);
+                                    JOptionPane.showMessageDialog(null, "El estado del artículo " + redactorArticle.getArticleId() + " se cambió a " + redactorArticle.getEstado());
+                                    break;
+                                }
+                            }
+                        } catch (Exception e) {
+                            System.out.println("No le logró modicar el artículo" + e);
+                        }
                     } else {
                         JOptionPane.showMessageDialog(null, "Artículo no encontrado.");
                         break;
                     }
 
                 }
-                case 3 -> {
+                case "3" -> {
 
                 }
-                case 4 -> {
+                case "4" -> {
                     break;
                 }
                 default ->
                     System.out.println("Error en la opcion");
 
             } // end switch for user redactor
-        } while (optionRedactor != 4);
+        } while (!"4".equals(optionRedactor));
     }
 
 }

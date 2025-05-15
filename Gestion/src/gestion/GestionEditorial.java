@@ -14,7 +14,7 @@ import javax.swing.JOptionPane;
 public class GestionEditorial {
     public static final Scanner read = new Scanner(System.in);
     public static Editor editor = new Editor("Editor1");
-    byte option = 0;
+    String option = "";
     
     //Busca redactores en la lista del editor
     public Redactor searchRedactors(int id) {
@@ -31,14 +31,23 @@ public class GestionEditorial {
     //Menú principal
     public void mainMenu() {
         do {
-            option = Byte.parseByte(JOptionPane.showInputDialog("""
+            option = JOptionPane.showInputDialog("""
                                1. Redactor.
                                2. Editor.
                                0. Salir del programa.
-                               Seleccione su usuario: """));
+                               Seleccione su usuario: """);
+            if (option == null || option.isBlank()) {
+                break;
+            }
             switch (option) {
-                case 1 -> {
-                    int idToSearch = Integer.parseInt(JOptionPane.showInputDialog("Ingrese su ID:"));
+                case "1" -> {
+                    String input = JOptionPane.showInputDialog("Ingrese su ID:");
+                    
+                    if (input == null || input.isBlank()) {
+                            JOptionPane.showMessageDialog(null, "Operación cancelada o ID inválido.");
+                            break;
+                        }
+                    int idToSearch = Integer.parseInt(input);
                     Redactor redactorFound = searchRedactors(idToSearch); // Utiliza la función searchRedactors para buscar
                     
                     if (redactorFound != null){
@@ -49,11 +58,11 @@ public class GestionEditorial {
                     
                     break;
                 }
-                case 2 -> {
+                case "2" -> {
                     editor.menuOptions();
                     break;
                 }
-                case 0 -> {
+                case "0" -> {
                     break;
                 }
                 default -> {
@@ -61,6 +70,6 @@ public class GestionEditorial {
                 }
             }//end of switch
 
-        } while (option!= 0);
+        } while (!"0".equals(option));
     }
 }
