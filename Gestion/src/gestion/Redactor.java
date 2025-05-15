@@ -175,8 +175,8 @@ public class Redactor implements Consult {
 
                 case "1" -> {
                     try {
-                        System.out.println("Redactor actual: ID " + this.redactorId + " - Artículos en cola: " + articlesQueue.size());
-                        JOptionPane.showMessageDialog(null, "Ingresando a los artículos ASIGNADOS");
+                        System.out.println("Redactor actual: ID " + this.redactorId + " - Articulos en cola: " + articlesQueue.size());
+                        JOptionPane.showMessageDialog(null, "Ingresando a sus articulos");
 
                         //¿MOSTRARLOS TODOS?
                         showArticlesRedactor();
@@ -192,25 +192,36 @@ public class Redactor implements Consult {
                             Article[] articlesListTmp = articlesQueue.toArray(Article[]::new);
                             Article redactorArticle = (Article) JOptionPane.showInputDialog(null, "Selecciona un artículo para modificar:", "Artículos",
                                     JOptionPane.QUESTION_MESSAGE, null, articlesListTmp, articlesListTmp.length > 0 ? articlesListTmp[0] : null);
+                            
+                            if (redactorArticle == null) {
+                                break;
+                            } else {
+                                System.out.println("Articulo actual:: " + redactorArticle);
 
-                            System.out.println(redactorArticle);
+                                String input = JOptionPane.showInputDialog("¿De cuántas palabras fue su artículo?");
 
-                            int newNumWords = Integer.parseInt(JOptionPane.showInputDialog("¿De cuántas palabras fue su artículo?"));
+                                if (input == null || input.isBlank()) {
+                                    break;
+                                }
+                                int newNumWords = Integer.parseInt(input);
 
-                            if (redactorArticle != null) {
                                 Article.Estado estadoSelect = (Article.Estado) JOptionPane.showInputDialog(null, "Seleccione el estado por cambiar", "Opciones",
                                         JOptionPane.YES_OPTION, null, estado, estado[0]);
-                                if (estadoSelect != null) {
+                                
+                                if (estadoSelect == null) {
+                                    break;
+                                } else {
                                     completedArticles(redactorArticle, newNumWords, GestionEditorial.editor);
                                     JOptionPane.showMessageDialog(null, "El estado del artículo " + redactorArticle.getArticleId() + " se cambió a " + redactorArticle.getEstado());
                                     break;
                                 }
                             }
+
                         } catch (Exception e) {
                             System.out.println("No le logró modicar el artículo" + e);
                         }
                     } else {
-                        JOptionPane.showMessageDialog(null, "Artículo no encontrado.");
+                        JOptionPane.showMessageDialog(null, "No tiene artículos por modificar.");
                         break;
                     }
 

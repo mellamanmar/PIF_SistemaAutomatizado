@@ -79,20 +79,38 @@ public class Editor implements Consult {
         return null;
     }
 
-    /*
-    public double calculatePayments( int id ){
-    Utilizar la llista de articulos publicados
-        for (Redactor redactor : listRedactors) {
-            if (id == redactor.getRedactorId()) {
-                //obtiene los datos para calcular
-                //calcula
-                return pago;
-            } else {
+    public void calculatePayments() {
+    if (!listRedactors.isEmpty()) {
+        StringBuilder reporte = new StringBuilder("PAGOS DE REDACTORES\n\n");
+        
 
-                System.out.println("no existe ese redactor");
+    for (Redactor redactor : listRedactors) {
+        double totalPago = 0;
+        int publishedArticles = 0;
+        
+        for (Article articulo : listPublishArticles) {
+            if (articulo.getEstado() == Article.Estado.PUBLICADO) {
+                totalPago += articulo.getWordNums()* redactor.getPricePerWord();
+                publishedArticles++;
             }
         }
-    }*/
+
+        reporte.append("Redactor: ").append(redactor.getRedactorName()).append("\n")
+               .append("ID: ").append(redactor.getRedactorId()).append("\n")
+               .append("Artículos publicados: ").append(publishedArticles).append("\n")
+               .append("Total a pagar: $").append(String.format("%.2f", totalPago)).append("\n\n");
+    }
+
+    JOptionPane.showMessageDialog(null, reporte.toString());
+        
+    } else {
+        JOptionPane.showMessageDialog(null, "No hay redactores registrados.");
+        return;
+    }
+
+    
+}
+    
     @Override
     public void menuOptions() {
         String optionEditor = " ";
@@ -117,9 +135,9 @@ public class Editor implements Consult {
                 }
                 case "3" -> {
                     showRedactors();
-                    int idToSearch = Integer.parseInt(JOptionPane.showInputDialog("Seleccione ingresando el id del redactor al que le quiere calcular el pago.\nIngrese ID: "));
-                    // Aquí solo se va a sumar el precio por artículo de cada redactor
-                    //calculatePayments( idToSearch );    
+                    //Considerar trabajarlo por redactor o todos a la vez como ya está
+                    //int idToSearch = Integer.parseInt(JOptionPane.showInputDialog("Seleccione ingresando el id del redactor al que le quiere calcular el pago.\nIngrese ID: "));
+                    calculatePayments();
                 }
                 case "4" -> {
 
@@ -237,7 +255,7 @@ public class Editor implements Consult {
                         } catch (Exception e) {
                             System.out.println("Algo sucedió al buscar los redactores " + e);
                         }
-
+                        
                     } else {
                         System.out.println("La lista de redactores esta vacia.");
                     }
@@ -450,6 +468,7 @@ public class Editor implements Consult {
                             selectedRedactor.addArticle(articleForAssign); // Agrega a la lista del redactor
                             JOptionPane.showMessageDialog(null, "Artículo asignado correctamente al redactor " + selectedRedactor.getRedactorName());
                             listArticles.remove(articleForAssign); // Luego lo elimina de la lista del editor
+                            
                         } catch (Exception e) {
                             System.out.println("Algo sucedió al alsignar el articulo " + e);
                         }
@@ -482,7 +501,7 @@ public class Editor implements Consult {
                                 int idForReview = articleForReview.getArticleId();
                                 System.out.println(showArticle(idForReview) + "\n-------------"); //Muestra la información del artículo seleccionado
 
-                                if ((articleForReview.getWordNums() <= 2500) && (articleForReview.getEstado().equals(Article.Estado.COMPLETADO))) {
+                                if ((articleForReview.getWordNums() < 3000) && (articleForReview.getEstado().equals(Article.Estado.COMPLETADO))) {
                                     reviewArticle(articleForReview, selectedRedactor);
                                 } else if (articleForReview.getWordNums() > 3000 && (articleForReview.getEstado().equals(Article.Estado.COMPLETADO))) {
                                     returnArticle(articleForReview, selectedRedactor);
