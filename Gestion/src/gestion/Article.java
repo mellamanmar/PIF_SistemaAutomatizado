@@ -39,7 +39,12 @@ public class Article {
     
     @Override
     public String toString(){
-        return "-ID: " + this.getArticleId()+ "\n-Keyword del artículo: "+this.getKeyword() + "\n-Palabras: " + this.getWordNums() +
+        return "- ID: " + this.getArticleId()+ "\n - Keyword del artículo: "+ getKeyword() +
+                "\n - Estado: " + this.getEstado();
+    }
+    
+    public String articleInfo(){
+        return "-ID: " + this.getArticleId()+ "\n-Keyword del articulo: "+this.getKeyword() + "\n-Palabras: " + this.getWordNums() +
                 "\n-Estado: " + this.getEstado() + "\n-Redactor: " + (redactor != null ? redactor.getRedactorName() : "Sin asignar");
     }
 

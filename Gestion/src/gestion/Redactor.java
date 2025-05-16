@@ -95,7 +95,9 @@ public class Redactor implements Consult {
     public void completedArticles(Article article, int numWords, Editor editor) {
         article.setWordNums(numWords);
         article.setEstado(Article.Estado.COMPLETADO);
-        GestionEditorial.editor.listArticles.add(article);
+        if (!GestionEditorial.editor.listArticles.contains(article)) {
+            GestionEditorial.editor.listArticles.add(article);
+        }
     }
 
     public void removeArticle(Article article) {
@@ -106,7 +108,9 @@ public class Redactor implements Consult {
         StringBuilder assigned = new StringBuilder("ARTÍCULOS ASIGNADOS:\n");
         StringBuilder completed = new StringBuilder("ARTÍCULOS COMPLETADOS:\n");
         StringBuilder returned = new StringBuilder("ARTÍCULOS DEVUELTOS:\n");
-        boolean hasAssigned, hasCompleted, hasReturned = false;
+        boolean hasAssigned = false;
+        boolean hasCompleted = false;
+        boolean hasReturned = false;
         StringBuilder resultArticles = new StringBuilder("--------------------------\n");
 
         if (!articlesQueue.isEmpty()) {
@@ -116,29 +120,30 @@ public class Redactor implements Consult {
                         case ASIGNADO -> {
                             hasAssigned = true;
                             assigned.append("ID: ").append(redactorArticle.getArticleId()).append(" | Palabra clave: ").append(redactorArticle.getKeyword()).append("\n");
-                            if (hasAssigned) {
-                                resultArticles.append(assigned).append("\n");
-                            }
                         }
                         case COMPLETADO -> {
                             hasCompleted = true;
-                            completed.append("ID: ").append(redactorArticle.getArticleId()).append(" | Palabra clave: ").append(redactorArticle.getKeyword()).append("\n");
-                            if (hasCompleted) {
-                                resultArticles.append(completed);
-                            }
+                            completed.append("ID: ").append(redactorArticle.getArticleId()).append(" | Palabra clave: ").append(redactorArticle.getKeyword()).append(" | Cantidad de palabras: ").append(redactorArticle.getWordNums()).append("\n");
                         }
                         case DEVUELTO -> {
                             hasReturned = true;
-                            returned.append("ID: ").append(redactorArticle.getArticleId()).append(" | Palabra clave: ").append(redactorArticle.getKeyword()).append("\n");
-                            if (hasReturned) {
-                                resultArticles.append(returned);
-                            }
+                            returned.append("ID: ").append(redactorArticle.getArticleId()).append(" | Palabra clave: ").append(redactorArticle.getKeyword()).append(" | Cantidad de palabras: ").append((redactorArticle.getWordNums())).append("\n");
                         }
                         default -> {
                         }
                     }
                 }
             }
+            if (hasAssigned) {
+                resultArticles.append(assigned).append("\n");
+            }
+            if (hasCompleted) {
+                resultArticles.append(completed).append("\n");
+            }
+            if (hasReturned) {
+                resultArticles.append(returned).append("\n");
+            }
+
             System.out.println(resultArticles.toString());
         } else {
             JOptionPane.showMessageDialog(null, "No tiene artículos en la cola");
@@ -162,12 +167,12 @@ public class Redactor implements Consult {
         Article.Estado[] estado = {Article.Estado.COMPLETADO};
         String optionRedactor = "";
         do {
-            optionRedactor = JOptionPane.showInputDialog("""
+            optionRedactor = JOptionPane.showInputDialog(null, """
                             1. Consultar artÍculos.
                             2. Modificar un artículo.
                             3. Ver reporte de mes.
                             4. Salir.
-                            Seleccione la accion que quiere hacer: """);
+                            Seleccione la accion que quiere hacer: """, "Menú Redactor", JOptionPane.INFORMATION_MESSAGE);
             if (optionRedactor == null || optionRedactor.isBlank()) {
                 break;
             }
@@ -192,30 +197,28 @@ public class Redactor implements Consult {
                             Article[] articlesListTmp = articlesQueue.toArray(Article[]::new);
                             Article redactorArticle = (Article) JOptionPane.showInputDialog(null, "Selecciona un artículo para modificar:", "Artículos",
                                     JOptionPane.QUESTION_MESSAGE, null, articlesListTmp, articlesListTmp.length > 0 ? articlesListTmp[0] : null);
-                            
                             if (redactorArticle == null) {
                                 break;
-                            } else {
-                                System.out.println("Articulo actual:: " + redactorArticle);
-
-                                String input = JOptionPane.showInputDialog("¿De cuántas palabras fue su artículo?");
-
-                                if (input == null || input.isBlank()) {
-                                    break;
-                                }
-                                int newNumWords = Integer.parseInt(input);
-
-                                Article.Estado estadoSelect = (Article.Estado) JOptionPane.showInputDialog(null, "Seleccione el estado por cambiar", "Opciones",
-                                        JOptionPane.YES_OPTION, null, estado, estado[0]);
-                                
-                                if (estadoSelect == null) {
-                                    break;
-                                } else {
-                                    completedArticles(redactorArticle, newNumWords, GestionEditorial.editor);
-                                    JOptionPane.showMessageDialog(null, "El estado del artículo " + redactorArticle.getArticleId() + " se cambió a " + redactorArticle.getEstado());
-                                    break;
-                                }
                             }
+
+                            System.out.println("Articulo actual:: \n" + redactorArticle);
+
+                            String input = JOptionPane.showInputDialog("¿De cuántas palabras fue su artículo?");
+
+                            if (input == null || input.isBlank()) {
+                                break;
+                            }
+                            int newNumWords = Integer.parseInt(input);
+
+                            Article.Estado estadoSelect = (Article.Estado) JOptionPane.showInputDialog(null, "Seleccione el estado por cambiar", "Opciones",
+                                    JOptionPane.YES_OPTION, null, estado, estado[0]);
+                            if (estadoSelect == null) {
+                                break;
+                            }
+
+                            completedArticles(redactorArticle, newNumWords, GestionEditorial.editor);
+                            JOptionPane.showMessageDialog(null, "El estado del artículo " + redactorArticle.getArticleId() + " se cambió a " + redactorArticle.getEstado());
+                            break;
 
                         } catch (Exception e) {
                             System.out.println("No le logró modicar el artículo" + e);

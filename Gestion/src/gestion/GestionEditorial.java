@@ -31,20 +31,20 @@ public class GestionEditorial {
     //Menú principal
     public void mainMenu() {
         do {
-            option = JOptionPane.showInputDialog("""
+            option = JOptionPane.showInputDialog(null, """
                                1. Redactor.
                                2. Editor.
                                0. Salir del programa.
-                               Seleccione su usuario: """);
+                               Seleccione su usuario: """, "Menú principal", JOptionPane.INFORMATION_MESSAGE);
             if (option == null || option.isBlank()) {
                 break;
             }
             switch (option) {
                 case "1" -> {
-                    String input = JOptionPane.showInputDialog("Ingrese su ID:");
+                    String input = JOptionPane.showInputDialog(null, "Ingrese su ID:", "Menú Redactor", JOptionPane.INFORMATION_MESSAGE);
                     
                     if (input == null || input.isBlank()) {
-                            JOptionPane.showMessageDialog(null, "Operación cancelada o ID inválido.");
+                            JOptionPane.showMessageDialog(null, "Operación cancelada");
                             break;
                         }
                     int idToSearch = Integer.parseInt(input);

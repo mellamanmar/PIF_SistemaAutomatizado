@@ -1,6 +1,7 @@
 package gestion;
 
 import java.util.ArrayList;
+import java.util.List;
 import javax.swing.*;
 
 public class Editor implements Consult {
@@ -80,47 +81,45 @@ public class Editor implements Consult {
     }
 
     public void calculatePayments() {
-    if (!listRedactors.isEmpty()) {
-        StringBuilder reporte = new StringBuilder("PAGOS DE REDACTORES\n\n");
-        
+        if (!listRedactors.isEmpty()) {
+            StringBuilder reporte = new StringBuilder("PAGOS DE REDACTORES\n\n");
 
-    for (Redactor redactor : listRedactors) {
-        double totalPago = 0;
-        int publishedArticles = 0;
-        
-        for (Article articulo : listPublishArticles) {
-            if (articulo.getEstado() == Article.Estado.PUBLICADO) {
-                totalPago += articulo.getWordNums()* redactor.getPricePerWord();
-                publishedArticles++;
+            for (Redactor redactor : listRedactors) {
+                double totalPago = 0;
+                int publishedArticles = 0;
+
+                for (Article articulo : listPublishArticles) {
+                    if (articulo.getEstado() == Article.Estado.PUBLICADO) {
+                        totalPago += articulo.getWordNums() * redactor.getPricePerWord();
+                        publishedArticles++;
+                    }
+                }
+
+                reporte.append("Redactor: ").append(redactor.getRedactorName()).append("\n")
+                        .append("ID: ").append(redactor.getRedactorId()).append("\n")
+                        .append("Artículos publicados: ").append(publishedArticles).append("\n")
+                        .append("Total a pagar: $").append(String.format("%.2f", totalPago)).append("\n\n");
             }
+
+            JOptionPane.showMessageDialog(null, reporte.toString());
+
+        } else {
+            JOptionPane.showMessageDialog(null, "No hay redactores registrados.");
+            return;
         }
 
-        reporte.append("Redactor: ").append(redactor.getRedactorName()).append("\n")
-               .append("ID: ").append(redactor.getRedactorId()).append("\n")
-               .append("Artículos publicados: ").append(publishedArticles).append("\n")
-               .append("Total a pagar: $").append(String.format("%.2f", totalPago)).append("\n\n");
     }
 
-    JOptionPane.showMessageDialog(null, reporte.toString());
-        
-    } else {
-        JOptionPane.showMessageDialog(null, "No hay redactores registrados.");
-        return;
-    }
-
-    
-}
-    
     @Override
     public void menuOptions() {
         String optionEditor = " ";
         do {
-            optionEditor = JOptionPane.showInputDialog(""" 
+            optionEditor = JOptionPane.showInputDialog(null, """ 
                                1. Acciones con redactor.
                                2. Acciones con articulos.
                                3. Calcular pagos.
                                4. Salir.
-                               Seleccione la accion que quiere hacer: """);
+                               Seleccione la accion que quiere hacer: """, "Menú Editor", JOptionPane.INFORMATION_MESSAGE);
             if (optionEditor == null || optionEditor.isBlank()) {
                 break;
             }
@@ -155,14 +154,14 @@ public class Editor implements Consult {
         Redactor.Region[] regions = Redactor.Region.values();
         String optionActionsRedactor = " ";
         do {
-            optionActionsRedactor = JOptionPane.showInputDialog("""
+            optionActionsRedactor = JOptionPane.showInputDialog(null, """
                                Seleccione la accion que quiere hacer:
                                1. Agregar redactor.
                                2. Eliminar redactor.
                                3. Consultar redactores.
                                4. Consultar redactor.
                                5. Salir.
-                               """); //Revisar el id de los redactores cuando se crean
+                               """, "Editor - Menú redactores", JOptionPane.INFORMATION_MESSAGE); //Revisar el id de los redactores cuando se crean
             if (optionActionsRedactor == null || optionActionsRedactor.isBlank()) {
                 break;
             }
@@ -170,21 +169,21 @@ public class Editor implements Consult {
 
                 case "1" -> {
                     try {
-                        String nameRedactor = JOptionPane.showInputDialog("Ingrese el nombre del redactor:");
+                        String nameRedactor = JOptionPane.showInputDialog(null, "Ingrese el nombre del redactor:", "Menú redactores - Agregar", JOptionPane.INFORMATION_MESSAGE);
                         if (nameRedactor == null || nameRedactor.isBlank()) {
-                            JOptionPane.showMessageDialog(null, "Operación cancelada o nombre inválido.");
+                            JOptionPane.showMessageDialog(null, "Operación cancelada. Nombre inválido.");
                             break;
                         }
 
-                        String priceInput = JOptionPane.showInputDialog("Ingrese el precio por palabra:");
+                        String priceInput = JOptionPane.showInputDialog(null, "Ingrese el precio por palabra:", "Menú redactores - Agregar", JOptionPane.INFORMATION_MESSAGE);
                         if (priceInput == null || priceInput.isBlank()) {
-                            JOptionPane.showMessageDialog(null, "Operación cancelada o precio no ingresado.");
+                            JOptionPane.showMessageDialog(null, "Operación cancelada. Precio no ingresado.");
                             break;
                         }
 
                         double pricePerWord = Double.parseDouble(priceInput);
 
-                        Redactor.Region regionSelect = (Redactor.Region) JOptionPane.showInputDialog(null, "Selecciona la region del redactor", "Opciones",
+                        Redactor.Region regionSelect = (Redactor.Region) JOptionPane.showInputDialog(null, "Selecciona la region del redactor", "Menú redactores - Agregar",
                                 JOptionPane.QUESTION_MESSAGE, null, regions, regions[0]);
 
                         if (regionSelect == null) {
@@ -205,14 +204,16 @@ public class Editor implements Consult {
 
                 case "2" -> {
                     if (!listRedactors.isEmpty()) {
-                        String input = JOptionPane.showInputDialog("Ingrese el ID del redactor que deseas eliminar: ");
 
-                        if (input == null || input.isBlank()) {
-                            JOptionPane.showMessageDialog(null, "Operación cancelada.");
+                        Redactor[] redactorsListTmp = listRedactors.toArray(Redactor[]::new);
+                        Redactor selectedRedactor = (Redactor) JOptionPane.showInputDialog(null, "Selecciona el redactor que quieres eliminar:", "Menú redactores - Elimiar",
+                                JOptionPane.QUESTION_MESSAGE, null, redactorsListTmp, redactorsListTmp.length > 0 ? redactorsListTmp[0].getRedactorName() : null);
+                        if (selectedRedactor == null) {
                             break;
                         }
+
                         try {
-                            int idToRemove = Integer.parseInt(input);
+                            int idToRemove = selectedRedactor.getRedactorId();
 
                             if (removeRedactor(idToRemove)) {
                                 System.out.println("Redactor eliminado con exito.");
@@ -233,7 +234,7 @@ public class Editor implements Consult {
                         try {
                             showRedactors();
                         } catch (Exception e) {
-                            System.out.println("Algo sucedió al buscar los redactores " + e);
+                            System.out.println("Algo sucedio al buscar los redactores " + e);
                         }
                     } else {
                         System.out.println("La lista de redactores esta vacia.");
@@ -241,21 +242,20 @@ public class Editor implements Consult {
 
                 }
                 case "4" -> {
-                    Object[] redactors = listRedactors.toArray();
+                    Redactor[] redactorsListTmp = listRedactors.toArray(Redactor[]::new);
 
                     if (!listRedactors.isEmpty()) {
                         try {
                             Redactor selectedRedactor = (Redactor) JOptionPane.showInputDialog(null, "Seleccione el redactor a consultar",
-                                    "Redatores", JOptionPane.QUESTION_MESSAGE, null,
-                                    redactors, redactors[0]);
+                                    "Menú redactores - Consultar", JOptionPane.QUESTION_MESSAGE, null, redactorsListTmp, redactorsListTmp[0]);
 
                             if (selectedRedactor != null) {
                                 selectedRedactor.showArticlesRedactor();
                             }
                         } catch (Exception e) {
-                            System.out.println("Algo sucedió al buscar los redactores " + e);
+                            System.out.println("Algo sucedio al buscar los redactores " + e);
                         }
-                        
+
                     } else {
                         System.out.println("La lista de redactores esta vacia.");
                     }
@@ -283,9 +283,9 @@ public class Editor implements Consult {
 
     public void showArticles() {
         for (Article article : listArticles) {
-            System.out.println("ID: " + article.getArticleId() + "\n Palabra clave: " + article.getKeyword());
+            System.out.println(article);
         }
-        System.out.println("------------------------");
+        System.out.println("------------------------\n----------------------");
     }
 
     public Article showArticle(int id) {
@@ -298,17 +298,36 @@ public class Editor implements Consult {
         return null;
     }
 
-    public Article asignArticle(Redactor redactor) {
-        for (Article article : listArticles) {
-            if ((article.getRedactor() == null) && (article.getEstado().equals(Article.Estado.POR_ASIGNAR))) {
-                article.setRedactor(redactor); // Se asigna el redactor al artículo
-                article.setEstado(Article.Estado.ASIGNADO); // Se cambia el estado a ASIGNADO
-                redactor.addArticle(article); // Asigna el artículo a la cola del redactor
-                return article;
-            }
+    public Article asignArticle() {
+        //Filtra de la lista de artículos del editor solo los que estan POR_ASIGNAR
+        List<Article> unassignedArticles = listArticles.stream()
+                .filter(article -> article.getEstado() == Article.Estado.POR_ASIGNAR)
+                .toList();
+
+        // Busca los artículos sin asignar en la lista del editor
+        Article[] articlesListTmp = unassignedArticles.toArray(Article[]::new);
+        Article articleForAssign = (Article) JOptionPane.showInputDialog(null, "Selecciona un artículo para asignar:", "Menú artículos - Asignar",
+                JOptionPane.QUESTION_MESSAGE, null, articlesListTmp, articlesListTmp.length > 0 ? articlesListTmp[0] : null);
+        if (articleForAssign == null) {
+            JOptionPane.showMessageDialog(null, "Operación cancelada");
+            return null;
         }
-        JOptionPane.showMessageDialog(null, "No hay artículos por asignar");
-        return null;
+        // Busca todos los redactores
+        Redactor[] redactorsListTmp = listRedactors.toArray(Redactor[]::new);
+        Redactor selectedRedactor = (Redactor) JOptionPane.showInputDialog(null, "Selecciona un redactor para asignar el artículo:", "Menú artículos - Asignar",
+                JOptionPane.QUESTION_MESSAGE, null, redactorsListTmp, redactorsListTmp.length > 0 ? redactorsListTmp[0].getRedactorName() : null);
+        if (selectedRedactor == null) {
+            JOptionPane.showMessageDialog(null, "Operación cancelada");
+            return null;
+        }
+
+        articleForAssign.setEstado(Article.Estado.ASIGNADO); // Cambia el estado del artículo seleccionado
+        articleForAssign.setRedactor(selectedRedactor); // Cambia el redactor por el escogido en la lista
+        selectedRedactor.addArticle(articleForAssign); // Agrega a la lista del redactor
+        JOptionPane.showMessageDialog(null, "Artículo asignado correctamente al redactor " + selectedRedactor.getRedactorName());
+        listArticles.remove(articleForAssign); // Luego lo elimina de la lista del editor
+
+        return articleForAssign;
     }
 
     public void reviewArticle(Article article, Redactor redactor) {
@@ -335,17 +354,28 @@ public class Editor implements Consult {
         article.setEstado(Article.Estado.PUBLICADO);
         listPublishArticles.add(article); //Función el editor que agrega a la lista de artículos publicados
 
-        System.out.println("Se agregó a la lista de publicados");
+        System.out.println("Se agrego a la lista de publicados");
 
         removeArticle(article); //Función del editor que quita los artículos de la cola general
 
-        System.out.println("Se emilinó de la lista general");
+        System.out.println("Se elimino de la lista general");
+    }
+
+    public double pricePerArticlePublished(Article article) {
+        double articlePrice = 0;
+            Redactor redactorTmp = article.getRedactor();
+            double priceRedactor = redactorTmp.getPricePerWord();
+            int wordsOfArticle = article.getWordNums();
+            articlePrice = priceRedactor * wordsOfArticle;
+            JOptionPane.showMessageDialog(null, "El costo del artículo de " + redactorTmp.getRedactorName() + " es de " + articlePrice);
+        
+        return articlePrice;
     }
 
     public void menuActionsArticle() {
         String optionActionsArticle = "";
         do {
-            optionActionsArticle = JOptionPane.showInputDialog("""
+            optionActionsArticle = JOptionPane.showInputDialog(null, """
                                                     Seleccione la acción que quiere hacer:
                                                     1. Agregar artículo.
                                                     2. Consultar artículos. 
@@ -353,7 +383,7 @@ public class Editor implements Consult {
                                                     4. Revisar artículo.
                                                     5. Publicar artículo.
                                                     6. Salir.
-                                                    """);
+                                                    """, "Editor - Menú artículos", JOptionPane.INFORMATION_MESSAGE);
             if (optionActionsArticle == null || optionActionsArticle.isBlank()) {
                 break;
             }
@@ -361,7 +391,7 @@ public class Editor implements Consult {
 
                 case "1" -> {
                     try {
-                        String newKeyword = JOptionPane.showInputDialog("Ingrese la keyword del articulo: ");
+                        String newKeyword = JOptionPane.showInputDialog(null, "Ingrese la keyword del articulo: ", "Menú artículos - Agregar", JOptionPane.INFORMATION_MESSAGE);
                         if (newKeyword == null) {
                             JOptionPane.showMessageDialog(null, "La keyword no puede estar vacía.");
                             break;
@@ -371,21 +401,22 @@ public class Editor implements Consult {
                         int response = JOptionPane.showConfirmDialog(
                                 null,
                                 "¿Deseas asignar un redactor al artículo?",
-                                "Asignar Redactor",
+                                "Menú artículos - Agregar",
                                 JOptionPane.YES_NO_OPTION
                         );
                         Redactor selectedRedactor = null;
 
-                        if (response == JOptionPane.YES_OPTION && !listRedactors.isEmpty()) {
-
-                            Redactor[] redactorsListTmp = listRedactors.toArray(Redactor[]::new);
-                            selectedRedactor = (Redactor) JOptionPane.showInputDialog(null, "Selecciona un redactor para revisar sus artículos:", "Redactores",
-                                    JOptionPane.QUESTION_MESSAGE, null, redactorsListTmp, redactorsListTmp[0]);
+                        if (response == JOptionPane.YES_OPTION) {
+                            if (!listRedactors.isEmpty()) {
+                                Redactor[] redactorsListTmp = listRedactors.toArray(Redactor[]::new);
+                                selectedRedactor = (Redactor) JOptionPane.showInputDialog(null, "Seleccione un redactor para asignarle el artículo:", "Menú artículos - Agregar",
+                                        JOptionPane.QUESTION_MESSAGE, null, redactorsListTmp, redactorsListTmp[0]);
+                            } else {
+                                JOptionPane.showMessageDialog(null, "No hay redactores en la lista");
+                            }
                         }
-                        if (response == JOptionPane.CANCEL_OPTION || listRedactors.isEmpty()) {
-                            break;
-                        }
 
+                        // Asigna el estado según corresponda
                         Article.Estado newEstado = (selectedRedactor != null)
                                 ? Article.Estado.ASIGNADO
                                 : Article.Estado.POR_ASIGNAR;
@@ -393,137 +424,172 @@ public class Editor implements Consult {
                         // Crea el artículo y lo agrega a la lista
                         Article newArticle = new Article(newKeyword, selectedRedactor, newEstado);
                         addArticleList(newArticle);
-
                         JOptionPane.showMessageDialog(null, "Artículo creado\n" + newArticle);
+
+                        if (response == JOptionPane.CANCEL_OPTION) {
+                            break;
+                        }
                     } catch (Exception e) {
                         System.out.println("Algo ocurrió con la creación del artículo " + e);
                     }
                     break;
                 }
-                case "2" -> {
 
+                case "2" -> {
                     if (!listArticles.isEmpty()) {
                         try {
                             showArticles(); //Se muestran todos los artículos
 
-                            String input = JOptionPane.showInputDialog("Desea consultar un articulo especifico? S/N");
-                            if (input == null || input.isBlank()) {
+                            int response = JOptionPane.showConfirmDialog(
+                                    null,
+                                    "Desea consultar un articulo especifico?",
+                                    "Menú artículos - Consultar",
+                                    JOptionPane.YES_NO_OPTION
+                            );
+
+                            if (response == JOptionPane.YES_OPTION) {
+                                //Busca en la lista de artículos
+                                Article[] articlesListTmp = listArticles.toArray(Article[]::new);
+                                Article articleToShow = (Article) JOptionPane.showInputDialog(null, "Selecciona un artículo:", "Menú artículos - Consultar",
+                                        JOptionPane.QUESTION_MESSAGE, null, articlesListTmp, articlesListTmp.length > 0 ? articlesListTmp[0] : null);
+
+                                if (articleToShow == null) {
+                                    break;
+                                }
+
+                                JOptionPane.showMessageDialog(null, articleToShow.articleInfo());
+                            }
+
+                            if (response == JOptionPane.CANCEL_OPTION) {
+                                JOptionPane.showMessageDialog(null, "Regresando al menú principal");
                                 break;
                             }
-                            char answer = input.charAt(0);
-                            switch (Character.toUpperCase(answer)) {
-                                case 'S' -> {
-                                    int idToSearch = Integer.parseInt(JOptionPane.showInputDialog("Ingresa el ID del articulo que deseas consultar: "));
-                                    System.out.println(showArticle(idToSearch));
-                                }
-                                case 'N' -> {
-                                    JOptionPane.showMessageDialog(null, "Regresando al menu principal");
-                                    break;
-                                }
-                                default -> {
-                                    JOptionPane.showMessageDialog(null, "Opcion no valida");
-                                    break;
-                                }
-                            }
                         } catch (Exception e) {
-                            System.out.println("Algo ocurrio al mostrar los artículos " + e);
+                            System.out.println("Error al mostrar los artículos " + e);
                         }
 
                     } else {
-                        System.out.println("La lista de articulos esta vacia.");  //Cuando no hay artículos POR_ASIGNAR o COMPLETADOS en la llista general
+                        System.out.println("La lista de articulos esta vacia.\n----------------------");  //Cuando no hay artículos POR_ASIGNAR o COMPLETADOS en la llista general
                     }
                     break;
                 }
-                case "3" -> {
 
+                case "3" -> {
                     boolean flag = true;
                     if (listArticles.isEmpty()) {
                         flag = false;
+                        System.out.println("No hay articulos por asignar \n----------------------");
                         break;
                     }
+
                     if (listRedactors.isEmpty()) {
                         flag = false;
+                        System.out.println("La lista de redactores esta vaacia\n----------------------");
                         break;
                     }
+
                     if (flag) {
                         try {
-                            // Busca los artículos en la lista del editor
-                            Article[] articlesListTmp = listArticles.toArray(Article[]::new);
-                            Article articleForAssign = (Article) JOptionPane.showInputDialog(null, "Selecciona un artículo para asignar:", "Artículos",
-                                    JOptionPane.QUESTION_MESSAGE, null, articlesListTmp, articlesListTmp.length > 0 ? articlesListTmp[0] : null);
-                            if (articleForAssign == null) {
-                                break;
-                            }
-
-                            // Busca todos los redactores 
-                            Redactor[] redactorsListTmp = listRedactors.toArray(Redactor[]::new);
-                            Redactor selectedRedactor = (Redactor) JOptionPane.showInputDialog(null, "Selecciona un redactor para asignar el artículo:", "Redactores",
-                                    JOptionPane.QUESTION_MESSAGE, null, redactorsListTmp, redactorsListTmp.length > 0 ? redactorsListTmp[0].getRedactorName() : null);
-                            if (selectedRedactor == null) {
-                                break;
-                            }
-
-                            articleForAssign.setEstado(Article.Estado.ASIGNADO); // Cambia el estado del artículo seleccionado
-                            articleForAssign.setRedactor(selectedRedactor); // Cambia el redactor por el escogido en la lista
-                            selectedRedactor.addArticle(articleForAssign); // Agrega a la lista del redactor
-                            JOptionPane.showMessageDialog(null, "Artículo asignado correctamente al redactor " + selectedRedactor.getRedactorName());
-                            listArticles.remove(articleForAssign); // Luego lo elimina de la lista del editor
-                            
+                            asignArticle(); // Asigna el artículo a través de la función
                         } catch (Exception e) {
-                            System.out.println("Algo sucedió al alsignar el articulo " + e);
+                            System.out.println("Algo sucedió al asignar el articulo " + e);
                         }
 
                     } else {
-                        JOptionPane.showMessageDialog(null, "No hay redactores registrados para asignar artículos.");
-
+                        JOptionPane.showMessageDialog(null, "No hay redactores registrados para asignar artículos.\n----------------------");
                     }
-
                 }
 
                 case "4" -> {
                     if (!listRedactors.isEmpty() && !listArticles.isEmpty()) {
                         try {
-                            // Busca el redactor de interés
-                            Redactor[] redactorsListTmp = listRedactors.toArray(Redactor[]::new);
-                            Redactor selectedRedactor = (Redactor) JOptionPane.showInputDialog(null, "Selecciona un redactor para revisar:", "Redactores",
-                                    JOptionPane.QUESTION_MESSAGE, null, redactorsListTmp, redactorsListTmp.length > 0 ? redactorsListTmp[0].getRedactorName() : null);
-                            if (selectedRedactor != null) {
-
-                                
-
-                                // ¿Mostrar los artículos por Redactor?
-                                
-                                //Muestra todos los artículos en la lista general del editor
-                                Article[] articlesListTmp = listArticles.toArray(Article[]::new);
-                                Article articleForReview = (Article) JOptionPane.showInputDialog(null, "Selecciona un artículo para revisar:", "Artículos",
-                                        JOptionPane.QUESTION_MESSAGE, null, articlesListTmp, articlesListTmp.length > 0 ? articlesListTmp[0] : null);
-
-                                int idForReview = articleForReview.getArticleId();
-                                System.out.println(showArticle(idForReview) + "\n-------------"); //Muestra la información del artículo seleccionado
-
-                                if ((articleForReview.getWordNums() < 3000) && (articleForReview.getEstado().equals(Article.Estado.COMPLETADO))) {
-                                    reviewArticle(articleForReview, selectedRedactor);
-                                } else if (articleForReview.getWordNums() > 3000 && (articleForReview.getEstado().equals(Article.Estado.COMPLETADO))) {
-                                    returnArticle(articleForReview, selectedRedactor);
-                                }
+                            //Muestra todos los artículos de la lista general del editor
+                            Article[] articlesListTmp = listArticles.toArray(Article[]::new);
+                            Article articleForReview = (Article) JOptionPane.showInputDialog(null, "Selecciona un artículo para revisar:", "Menú artículos - Revisar",
+                                    JOptionPane.QUESTION_MESSAGE, null, articlesListTmp, articlesListTmp.length > 0 ? articlesListTmp[0] : null);
+                            if (articleForReview == null) {
+                                break;
                             }
+
+                            int idForReview = articleForReview.getArticleId();
+                            Redactor selectedRedactor = articleForReview.getRedactor();
+                            System.out.println(showArticle(idForReview) + "\n-------------\n--------------"); //Muestra la información del artículo seleccionado
+
+                            if ((articleForReview.getWordNums() > 0) && (articleForReview.getWordNums() < 3000) && (articleForReview.getEstado().equals(Article.Estado.COMPLETADO))) {
+                                reviewArticle(articleForReview, selectedRedactor);
+                            } else if (articleForReview.getWordNums() >= 3000 && (articleForReview.getEstado().equals(Article.Estado.COMPLETADO))) {
+                                returnArticle(articleForReview, selectedRedactor);
+                            }
+
                         } catch (Exception e) {
-                            System.out.println("Hubo algún error al corregir al redactor " + e);
+                            System.out.println("Error al corregir al redactor " + e);
                         }
 
                     } else {
-                        JOptionPane.showMessageDialog(null, "No se encontró qué revisar");
+                        JOptionPane.showMessageDialog(null, "No hay artículos por revisar");
                         break;
                     }
                 }
                 case "5" -> {
-                    // Pasar artículos publicados a la lista correspondiente y totalizar el precio por artículo
+                    if (!listArticles.isEmpty()) {
+                        try {
+                            // Recorre los artículos de la lista general y toma los que estan CORREGIDOS
+                            List<Article> toPublish = listArticles.stream()
+                                    .filter(a -> a.getEstado() == Article.Estado.CORREGIDO)
+                                    .toList();
+                            
+                            if (toPublish.isEmpty()) {
+                                JOptionPane.showMessageDialog(null, "No hay artículos para publicar.");
+                                break;
+                            }
+                            
+                            Article[] articlesListTmp = toPublish.toArray(Article[]::new);
+                            Article articleToPublish = (Article) JOptionPane.showInputDialog(null, "Selecciona alguno de los artículos para publicar:", "Menú artículos - Publicar",
+                                    JOptionPane.QUESTION_MESSAGE, null, articlesListTmp, articlesListTmp.length > 0 ? articlesListTmp[0] : null);
+
+                            if (articleToPublish == null) {
+                                break;
+                            }
+
+                            System.out.println(showArticle(articleToPublish.getArticleId())); //Muestra la información del artículo
+
+                            String url = JOptionPane.showInputDialog(null, "Ingrese la URL del artículo", "Menú artículos - Publicar", JOptionPane.INFORMATION_MESSAGE);
+                            if (url == null || url.isBlank()) {
+                                JOptionPane.showMessageDialog(null, "Publicación cancelada");
+                                break;
+                            }
+
+                            articleToPublish.setUrl(url); // Asigna una URL como condición para publicar
+                            publishArticle(articleToPublish);
+
+                            //Diálogo para preguntar si quiere revisar el precio
+                            int response = JOptionPane.showConfirmDialog(
+                                    null,
+                                    "¿Desea ver el precio del artículo?",
+                                    "Menú artículos - Publicar",
+                                    JOptionPane.YES_NO_OPTION
+                            );
+
+                            if (response == JOptionPane.YES_OPTION) {
+                                pricePerArticlePublished(articleToPublish);
+                            }
+                            if (response == JOptionPane.CANCEL_OPTION) {
+                                break;
+                            }
+
+                        } catch (Exception e) {
+                            System.out.println("Ocurrio algo en la publicación de los artículos");
+                        }
+
+                    }
                 }
+
                 case "6" -> {
                     break;
                 }
                 default ->
-                    System.out.println("Error en la opcion");
+                    System.out.println(
+                            "Error en la opcion");
 
             }//end switch for Actions whit Articles}
 
