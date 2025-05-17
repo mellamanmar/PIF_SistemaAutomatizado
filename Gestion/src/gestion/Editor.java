@@ -89,10 +89,8 @@ public class Editor implements Consult {
                 int publishedArticles = 0;
 
                 for (Article articulo : listPublishArticles) {
-                    if (articulo.getEstado() == Article.Estado.PUBLICADO) {
-                        totalPago += articulo.getWordNums() * redactor.getPricePerWord();
-                        publishedArticles++;
-                    }
+                    totalPago += articulo.getWordNums() * redactor.getPricePerWord();
+                    publishedArticles++;
                 }
 
                 reporte.append("Redactor: ").append(redactor.getRedactorName()).append("\n")
@@ -118,7 +116,7 @@ public class Editor implements Consult {
                                1. Acciones con redactor.
                                2. Acciones con articulos.
                                3. Calcular pagos.
-                               4. Salir.
+                               4. Volver.
                                Seleccione la accion que quiere hacer: """, "Menú Editor", JOptionPane.INFORMATION_MESSAGE);
             if (optionEditor == null || optionEditor.isBlank()) {
                 break;
@@ -160,7 +158,7 @@ public class Editor implements Consult {
                                2. Eliminar redactor.
                                3. Consultar redactores.
                                4. Consultar redactor.
-                               5. Salir.
+                               5. Volver.
                                """, "Editor - Menú redactores", JOptionPane.INFORMATION_MESSAGE); //Revisar el id de los redactores cuando se crean
             if (optionActionsRedactor == null || optionActionsRedactor.isBlank()) {
                 break;
@@ -282,10 +280,11 @@ public class Editor implements Consult {
     }
 
     public void showArticles() {
+        System.out.println("-----------------------------------------------------------\nArtículos de la lista del editor");
         for (Article article : listArticles) {
             System.out.println(article);
         }
-        System.out.println("------------------------\n----------------------");
+        System.out.println("-----------------------------------------------------------");
     }
 
     public Article showArticle(int id) {
@@ -363,12 +362,12 @@ public class Editor implements Consult {
 
     public double pricePerArticlePublished(Article article) {
         double articlePrice = 0;
-            Redactor redactorTmp = article.getRedactor();
-            double priceRedactor = redactorTmp.getPricePerWord();
-            int wordsOfArticle = article.getWordNums();
-            articlePrice = priceRedactor * wordsOfArticle;
-            JOptionPane.showMessageDialog(null, "El costo del artículo de " + redactorTmp.getRedactorName() + " es de " + articlePrice);
-        
+        Redactor redactorTmp = article.getRedactor();
+        double priceRedactor = redactorTmp.getPricePerWord();
+        int wordsOfArticle = article.getWordNums();
+        articlePrice = priceRedactor * wordsOfArticle;
+        JOptionPane.showMessageDialog(null, "El costo del artículo de " + redactorTmp.getRedactorName() + " es de " + articlePrice);
+
         return articlePrice;
     }
 
@@ -378,11 +377,11 @@ public class Editor implements Consult {
             optionActionsArticle = JOptionPane.showInputDialog(null, """
                                                     Seleccione la acción que quiere hacer:
                                                     1. Agregar artículo.
-                                                    2. Consultar artículos. 
+                                                    2. Consultar artículos del editor. 
                                                     3. Asignar artículo.
                                                     4. Revisar artículo.
                                                     5. Publicar artículo.
-                                                    6. Salir.
+                                                    6. Volver.
                                                     """, "Editor - Menú artículos", JOptionPane.INFORMATION_MESSAGE);
             if (optionActionsArticle == null || optionActionsArticle.isBlank()) {
                 break;
@@ -400,7 +399,7 @@ public class Editor implements Consult {
                         // Diálogo para decidir si agregar redactor en este punto
                         int response = JOptionPane.showConfirmDialog(
                                 null,
-                                "¿Deseas asignar un redactor al artículo?",
+                                "¿Asignar redactor ahora?",
                                 "Menú artículos - Agregar",
                                 JOptionPane.YES_NO_OPTION
                         );
@@ -442,7 +441,7 @@ public class Editor implements Consult {
 
                             int response = JOptionPane.showConfirmDialog(
                                     null,
-                                    "Desea consultar un articulo especifico?",
+                                    "¿Consultar un articulo especifico?",
                                     "Menú artículos - Consultar",
                                     JOptionPane.YES_NO_OPTION
                             );
@@ -465,11 +464,11 @@ public class Editor implements Consult {
                                 break;
                             }
                         } catch (Exception e) {
-                            System.out.println("Error al mostrar los artículos " + e);
+                            System.out.println("Error al mostrar los artículos " + e + "\n-----------------------------------------");
                         }
 
                     } else {
-                        System.out.println("La lista de articulos esta vacia.\n----------------------");  //Cuando no hay artículos POR_ASIGNAR o COMPLETADOS en la llista general
+                        System.out.println("La lista de articulos esta vacia.\n------------------------------");  //Cuando no hay artículos POR_ASIGNAR o COMPLETADOS en la llista general
                     }
                     break;
                 }
@@ -478,7 +477,7 @@ public class Editor implements Consult {
                     boolean flag = true;
                     if (listArticles.isEmpty()) {
                         flag = false;
-                        System.out.println("No hay articulos por asignar \n----------------------");
+                        System.out.println("No hay articulos por asignar \n----------------------------");
                         break;
                     }
 
@@ -492,11 +491,11 @@ public class Editor implements Consult {
                         try {
                             asignArticle(); // Asigna el artículo a través de la función
                         } catch (Exception e) {
-                            System.out.println("Algo sucedió al asignar el articulo " + e);
+                            System.out.println("Algo sucedió al asignar el articulo " + e + "\n----------------------");
                         }
 
                     } else {
-                        JOptionPane.showMessageDialog(null, "No hay redactores registrados para asignar artículos.\n----------------------");
+                        JOptionPane.showMessageDialog(null, "No hay redactores registrados para asignar artículos");
                     }
                 }
 
@@ -513,7 +512,7 @@ public class Editor implements Consult {
 
                             int idForReview = articleForReview.getArticleId();
                             Redactor selectedRedactor = articleForReview.getRedactor();
-                            System.out.println(showArticle(idForReview) + "\n-------------\n--------------"); //Muestra la información del artículo seleccionado
+                            System.out.println(showArticle(idForReview)); //Muestra la información del artículo seleccionado
 
                             if ((articleForReview.getWordNums() > 0) && (articleForReview.getWordNums() < 3000) && (articleForReview.getEstado().equals(Article.Estado.COMPLETADO))) {
                                 reviewArticle(articleForReview, selectedRedactor);
@@ -522,7 +521,7 @@ public class Editor implements Consult {
                             }
 
                         } catch (Exception e) {
-                            System.out.println("Error al corregir al redactor " + e);
+                            System.out.println("Error al corregir al redactor " + e + "\n----------------------------");
                         }
 
                     } else {
@@ -537,12 +536,12 @@ public class Editor implements Consult {
                             List<Article> toPublish = listArticles.stream()
                                     .filter(a -> a.getEstado() == Article.Estado.CORREGIDO)
                                     .toList();
-                            
+
                             if (toPublish.isEmpty()) {
                                 JOptionPane.showMessageDialog(null, "No hay artículos para publicar.");
                                 break;
                             }
-                            
+
                             Article[] articlesListTmp = toPublish.toArray(Article[]::new);
                             Article articleToPublish = (Article) JOptionPane.showInputDialog(null, "Selecciona alguno de los artículos para publicar:", "Menú artículos - Publicar",
                                     JOptionPane.QUESTION_MESSAGE, null, articlesListTmp, articlesListTmp.length > 0 ? articlesListTmp[0] : null);
@@ -565,7 +564,7 @@ public class Editor implements Consult {
                             //Diálogo para preguntar si quiere revisar el precio
                             int response = JOptionPane.showConfirmDialog(
                                     null,
-                                    "¿Desea ver el precio del artículo?",
+                                    "¿Ver el precio del artículo?",
                                     "Menú artículos - Publicar",
                                     JOptionPane.YES_NO_OPTION
                             );
@@ -578,7 +577,7 @@ public class Editor implements Consult {
                             }
 
                         } catch (Exception e) {
-                            System.out.println("Ocurrio algo en la publicación de los artículos");
+                            System.out.println("Ocurrio algo en la publicación de los artículos " + e + "\n----------------------");
                         }
 
                     }
@@ -590,7 +589,6 @@ public class Editor implements Consult {
                 default ->
                     System.out.println(
                             "Error en la opcion");
-
             }//end switch for Actions whit Articles}
 
         } while (!"6".equals(optionActionsArticle));

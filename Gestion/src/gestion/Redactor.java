@@ -1,11 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package gestion;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
+import java.time.LocalDate;
+import java.time.Month;
+import java.util.*;
 import javax.swing.JOptionPane;
 
 /**
@@ -135,13 +132,13 @@ public class Redactor implements Consult {
                 }
             }
             if (hasAssigned) {
-                resultArticles.append(assigned).append("\n");
+                resultArticles.append(assigned).append("-----------------------\n");
             }
             if (hasCompleted) {
-                resultArticles.append(completed).append("\n");
+                resultArticles.append(completed).append("----------------------\n");
             }
             if (hasReturned) {
-                resultArticles.append(returned).append("\n");
+                resultArticles.append(returned).append("-----------------------\n");
             }
 
             System.out.println(resultArticles.toString());
@@ -162,6 +159,24 @@ public class Redactor implements Consult {
         return null;
     }
 
+    public void generatePayReport() {
+        StringBuilder reporte = new StringBuilder("REPORTE DE PAGO\n\n" + LocalDate.now());
+        double totalPago = 0;
+        int publishedArticles = 0;
+
+        for (Article articulo : GestionEditorial.editor.listPublishArticles) {
+            totalPago += articulo.getWordNums() * getPricePerWord();
+            publishedArticles++;
+        }
+
+        reporte.append("Redactor: ").append(getRedactorName()).append("\n")
+                .append("ID: ").append(getRedactorId()).append("\n")
+                .append("Artículos publicados: ").append(publishedArticles).append("\n")
+                .append("Total a pagar: $").append(String.format("%.2f", totalPago)).append("\n\n");
+
+        JOptionPane.showMessageDialog(null, reporte.toString());
+    }
+
     @Override
     public void menuOptions() {
         Article.Estado[] estado = {Article.Estado.COMPLETADO};
@@ -171,7 +186,7 @@ public class Redactor implements Consult {
                             1. Consultar artÍculos.
                             2. Modificar un artículo.
                             3. Ver reporte de mes.
-                            4. Salir.
+                            4. Volver.
                             Seleccione la accion que quiere hacer: """, "Menú Redactor", JOptionPane.INFORMATION_MESSAGE);
             if (optionRedactor == null || optionRedactor.isBlank()) {
                 break;
@@ -181,12 +196,11 @@ public class Redactor implements Consult {
                 case "1" -> {
                     try {
                         System.out.println("Redactor actual: ID " + this.redactorId + " - Articulos en cola: " + articlesQueue.size());
-                        JOptionPane.showMessageDialog(null, "Ingresando a sus articulos");
+                        JOptionPane.showMessageDialog(null, "---------------------\nIngresando a sus articulos");
 
-                        //¿MOSTRARLOS TODOS?
                         showArticlesRedactor();
                     } catch (Exception e) {
-                        System.out.println("No le logró mostrar los artículos asignados" + e);
+                        System.out.println("No le logró mostrar los articulos asignados" + e);
                     }
                     break;
                 }
@@ -201,7 +215,7 @@ public class Redactor implements Consult {
                                 break;
                             }
 
-                            System.out.println("Articulo actual:: \n" + redactorArticle);
+                            System.out.println("-----------------------\nArticulo actual: \n" + redactorArticle);
 
                             String input = JOptionPane.showInputDialog("¿De cuántas palabras fue su artículo?");
 
@@ -221,7 +235,7 @@ public class Redactor implements Consult {
                             break;
 
                         } catch (Exception e) {
-                            System.out.println("No le logró modicar el artículo" + e);
+                            System.out.println("No le logro modicar el articulo" + e);
                         }
                     } else {
                         JOptionPane.showMessageDialog(null, "No tiene artículos por modificar.");
@@ -230,7 +244,7 @@ public class Redactor implements Consult {
 
                 }
                 case "3" -> {
-
+                    generatePayReport();
                 }
                 case "4" -> {
                     break;
