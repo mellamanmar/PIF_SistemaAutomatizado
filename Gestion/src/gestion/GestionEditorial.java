@@ -1,9 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package gestion;
 
+import java.io.File;
 import java.util.Scanner;
 import javax.swing.JOptionPane;
 
@@ -14,6 +12,7 @@ import javax.swing.JOptionPane;
 public class GestionEditorial {
     public static final Scanner read = new Scanner(System.in);
     public static Editor editor = new Editor("Editor1");
+    File archivo = new File("redactores.txt");
     String option = "";
     
     //Busca redactores en la lista del editor
@@ -63,6 +62,8 @@ public class GestionEditorial {
                     break;
                 }
                 case "0" -> {
+                    PersistenciaDatos.saveData(editor.listRedactors, "redactores.txt");
+                    System.out.println("Archivo guardado en: " + archivo.getAbsolutePath());
                     break;
                 }
                 default -> {

@@ -1,7 +1,6 @@
 package gestion;
 
 import java.time.LocalDate;
-import java.time.Month;
 import java.util.*;
 import javax.swing.JOptionPane;
 
@@ -102,9 +101,9 @@ public class Redactor implements Consult {
     }
 
     public void showArticlesRedactor() {
-        StringBuilder assigned = new StringBuilder("ARTÍCULOS ASIGNADOS:\n");
-        StringBuilder completed = new StringBuilder("ARTÍCULOS COMPLETADOS:\n");
-        StringBuilder returned = new StringBuilder("ARTÍCULOS DEVUELTOS:\n");
+        StringBuilder assigned = new StringBuilder("ARTICULOS ASIGNADOS:\n");
+        StringBuilder completed = new StringBuilder("ARTICULOS COMPLETADOS:\n");
+        StringBuilder returned = new StringBuilder("ARTICULOS DEVUELTOS:\n");
         boolean hasAssigned = false;
         boolean hasCompleted = false;
         boolean hasReturned = false;
@@ -164,17 +163,22 @@ public class Redactor implements Consult {
         double totalPago = 0;
         int publishedArticles = 0;
 
-        for (Article articulo : GestionEditorial.editor.listPublishArticles) {
-            totalPago += articulo.getWordNums() * getPricePerWord();
-            publishedArticles++;
+        for (Redactor redactor : GestionEditorial.editor.listRedactors) {
+
+            for (Article articulo : GestionEditorial.editor.listPublishArticles) {
+                if (articulo.getRedactor().equals(redactor)) {
+                    totalPago += articulo.getWordNums() * redactor.getPricePerWord();
+                    publishedArticles++;
+                }
+            }
+
+            reporte.append("Redactor: ").append(getRedactorName()).append("\n")
+                    .append("ID: ").append(getRedactorId()).append("\n")
+                    .append("Artículos publicados: ").append(publishedArticles).append("\n")
+                    .append("Total a pagar: $").append(String.format("%.2f", totalPago)).append("\n\n");
+
+            JOptionPane.showMessageDialog(null, reporte.toString());
         }
-
-        reporte.append("Redactor: ").append(getRedactorName()).append("\n")
-                .append("ID: ").append(getRedactorId()).append("\n")
-                .append("Artículos publicados: ").append(publishedArticles).append("\n")
-                .append("Total a pagar: $").append(String.format("%.2f", totalPago)).append("\n\n");
-
-        JOptionPane.showMessageDialog(null, reporte.toString());
     }
 
     @Override
@@ -196,7 +200,7 @@ public class Redactor implements Consult {
                 case "1" -> {
                     try {
                         System.out.println("Redactor actual: ID " + this.redactorId + " - Articulos en cola: " + articlesQueue.size());
-                        JOptionPane.showMessageDialog(null, "---------------------\nIngresando a sus articulos");
+                        JOptionPane.showMessageDialog(null, "Ingresando a sus articulos");
 
                         showArticlesRedactor();
                     } catch (Exception e) {

@@ -1,8 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
- */
+
 package gestion;
+
+import java.util.*;
+
 /**
  *
  * @author general
@@ -14,11 +14,18 @@ public class Gestion {
      */
     public static void main(String[] args) {
        
+        ArrayList<Redactor> redactores = PersistenciaDatos.loadData("redactores.txt");
+        
+        GestionEditorial.editor.listRedactors = redactores;
         
         GestionEditorial gestion = new GestionEditorial();
+        
         gestion.mainMenu();
         
-        System.out.println(Redactor.counter);
+        PersistenciaDatos.saveData(GestionEditorial.editor.listRedactors, "redactores.txt");
+        
+        System.out.println("Cantidad de redactores: " + Redactor.counter);
+        
         
     }
 

@@ -89,8 +89,10 @@ public class Editor implements Consult {
                 int publishedArticles = 0;
 
                 for (Article articulo : listPublishArticles) {
-                    totalPago += articulo.getWordNums() * redactor.getPricePerWord();
-                    publishedArticles++;
+                    if (articulo.getRedactor().equals(redactor)) {
+                        totalPago += articulo.getWordNums() * redactor.getPricePerWord();
+                        publishedArticles++;
+                    }
                 }
 
                 reporte.append("Redactor: ").append(redactor.getRedactorName()).append("\n")
@@ -105,7 +107,6 @@ public class Editor implements Consult {
             JOptionPane.showMessageDialog(null, "No hay redactores registrados.");
             return;
         }
-
     }
 
     @Override
@@ -339,7 +340,7 @@ public class Editor implements Consult {
     }
 
     public void returnArticle(Article article, Redactor redactor) {
-        System.out.println("Devolviendo...");
+        System.out.println("Corrigiendo...");
         listArticles.remove(article);
         article.setEstado(Article.Estado.DEVUELTO);
 
@@ -512,6 +513,7 @@ public class Editor implements Consult {
 
                             int idForReview = articleForReview.getArticleId();
                             Redactor selectedRedactor = articleForReview.getRedactor();
+                            System.out.println("--------------------\nArticulo actual");
                             System.out.println(showArticle(idForReview)); //Muestra la información del artículo seleccionado
 
                             if ((articleForReview.getWordNums() > 0) && (articleForReview.getWordNums() < 3000) && (articleForReview.getEstado().equals(Article.Estado.COMPLETADO))) {
