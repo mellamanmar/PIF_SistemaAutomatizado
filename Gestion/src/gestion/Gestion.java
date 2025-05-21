@@ -21,9 +21,7 @@ public class Gestion {
         GestionEditorial gestion = new GestionEditorial();
         
         gestion.mainMenu();
-        
-        PersistenciaDatos.saveData(GestionEditorial.editor.listRedactors, "redactores.txt");
-        
+                
         System.out.println("Cantidad de redactores: " + Redactor.counter);
         
         
