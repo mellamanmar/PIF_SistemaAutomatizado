@@ -6,47 +6,57 @@ package gestion;
 
 
 public class Article {
-// Agregar un ID que se autoincremente solo size()+1 
-    private static int counter = 0;
-    private int id;
-    private String titulo;
+    private static int counter;
+    private int articleId;
+    private String keyword;
     private String url;
     private Redactor redactor;
-    private int numPalabras;
+    private int wordNums;
     private Estado estado;
 
-    enum Estado {
+    public enum Estado {
         POR_ASIGNAR,
         ASIGNADO,
         COMPLETADO,
         CORREGIDO,
         DEVUELTO,
-        PUBLICADO
+        PUBLICADO,
+        PRUEBA
     }
 
-    public Article(String titulo, String url, Redactor redactor, int numPalabras, Estado estado) {
-        this.id = ++counter;
-        this.titulo = titulo;
-        this.url = url;
+    public Article(String keyword, Redactor redactor, Estado estado) {
+        if (counter == 0){
+            counter = 1;
+        }else {
+            counter++;
+        }
+        this.keyword = keyword;
         this.redactor = redactor;
-        this.numPalabras = numPalabras;
         this.estado = estado;
+        this.articleId = counter; 
     }
     
-    public int getId(){
-        return id;
-    }
+    
     @Override
     public String toString(){
-        return "ID: "+this.id + ", titulo: "+this.titulo + ", URL: "+this.url +  ", Palabras: " + numPalabras +
-                ", estado: " + estado + ", redactor: " + (redactor != null ? redactor.getRedactorName() : "No asignado"); //Completar el toString con los atributos del articulo. LESLY
-    }
-    public String getTitulo() {
-        return titulo;
+        return "-ID: " + this.getArticleId()+ "\n-Keyword del artículo: "+this.getKeyword() + "\n-Palabras: " + this.getWordNums() +
+                "\n-Estado: " + this.getEstado() + "\n-Redactor: " + (redactor != null ? redactor.getRedactorName() : "Sin asignar");
     }
 
-    public void setTitulo(String titulo) {
-        this.titulo = titulo;
+    public int getArticleId() {
+        return articleId;
+    }
+
+    public void setArticleId(int articleId) {
+        this.articleId = articleId;
+    }
+
+    public String getKeyword() {
+        return keyword;
+    }
+
+    public void setKeyword(String keyword) {
+        this.keyword = keyword;
     }
 
     public String getUrl() {
@@ -65,12 +75,12 @@ public class Article {
         this.redactor = redactor;
     }
 
-    public int getNumPalabras() {
-        return numPalabras;
+    public int getWordNums() {
+        return wordNums;
     }
 
-    public void setNumPalabras(int numPalabras) {
-        this.numPalabras = numPalabras;
+    public void setWordNums(int wordNums) {
+        this.wordNums = wordNums;
     }
 
     public Estado getEstado() {
@@ -80,7 +90,10 @@ public class Article {
     public void setEstado(Estado estado) {
         this.estado = estado;
     }
+ 
     
+    
+
     
 
 }
