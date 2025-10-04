@@ -3,6 +3,8 @@ package gestion;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
+import teorico.Reguex;
+import teorico.Automata;
 
 public class Editor implements Consult {
 
@@ -321,7 +323,13 @@ public class Editor implements Consult {
             return null;
         }
 
-        articleForAssign.setEstado(Article.Estado.ASIGNADO); // Cambia el estado del artículo seleccionado
+        // Usar el autómata para cambiar el estado
+        if (articleForAssign.procesarAccion(Automata.Accion.ASIGNAR)) {
+            System.out.println("Estado cambiado a: " + articleForAssign.getEstado());
+        } else {
+            System.out.println("Error: No se pudo cambiar el estado del artículo");
+            return null;
+        }
         articleForAssign.setRedactor(selectedRedactor); // Cambia el redactor por el escogido en la lista
         selectedRedactor.addArticle(articleForAssign); // Agrega a la lista del redactor
         JOptionPane.showMessageDialog(null, "Artículo asignado correctamente al redactor " + selectedRedactor.getRedactorName());
@@ -332,26 +340,36 @@ public class Editor implements Consult {
 
     public void reviewArticle(Article article, Redactor redactor) {
         System.out.println("Corrigiendo...");
-        article.setEstado(Article.Estado.CORREGIDO);
-        redactor.removeArticle(article);
-
-        //Prueba
-        System.out.println("Se corrige el artículo --- Estado nuevo: " + article.getEstado());
+        
+        // Usar el autómata para cambiar el estado
+        if (article.procesarAccion(Automata.Accion.REVISAR_OK)) {
+            System.out.println("Se corrige el artículo --- Estado nuevo: " + article.getEstado());
+            redactor.removeArticle(article);
+        } else {
+            System.out.println("Error: No se pudo cambiar el estado del artículo a CORREGIDO");
+        }
     }
 
     public void returnArticle(Article article, Redactor redactor) {
-        System.out.println("Corrigiendo...");
-        listArticles.remove(article);
-        article.setEstado(Article.Estado.DEVUELTO);
-
-        //Prueba
-        System.out.println("El artículo debe estar devuelto ::::" + article.getEstado());
-        //La función debe enviar y eliminar el artículo de la cola de cada redactor
+        System.out.println("Devolviendo artículo...");
+        
+        // Usar el autómata para cambiar el estado
+        if (article.procesarAccion(Automata.Accion.REVISAR_ERROR)) {
+            System.out.println("El artículo debe estar devuelto ::::" + article.getEstado());
+            listArticles.remove(article);
+            //La función debe enviar y eliminar el artículo de la cola de cada redactor
+        } else {
+            System.out.println("Error: No se pudo cambiar el estado del artículo a DEVUELTO");
+        }
     }
 
     public void publishArticle(Article article) {
         System.out.println("Publicando...");
-        article.setEstado(Article.Estado.PUBLICADO);
+        // Usar el autómata para cambiar el estado
+        if (!article.procesarAccion(Automata.Accion.PUBLICAR)) {
+            System.out.println("Error: No se pudo cambiar el estado del artículo a PUBLICADO");
+            return;
+        }
         listPublishArticles.add(article); //Función el editor que agrega a la lista de artículos publicados
 
         System.out.println("Se agrego a la lista de publicados");
@@ -554,9 +572,54 @@ public class Editor implements Consult {
 
                             System.out.println(showArticle(articleToPublish.getArticleId())); //Muestra la información del artículo
 
-                            String url = JOptionPane.showInputDialog(null, "Ingrese la URL del artículo", "Menú artículos - Publicar", JOptionPane.INFORMATION_MESSAGE);
-                            if (url == null || url.isBlank()) {
-                                JOptionPane.showMessageDialog(null, "Publicación cancelada");
+                            // Proceso de validación de URL con regex
+                            String url = null;
+                            boolean urlValida = false;
+                            
+                            while (!urlValida) {
+                                // Generar URL sugerida basada en la keyword
+                                String urlSugerida = Reguex.generarUrlSugerida(articleToPublish.getKeyword());
+                                
+                                String mensaje = "Ingrese la URL del artículo\n" +
+                                               "Keyword del artículo: '" + articleToPublish.getKeyword() + "'\n" +
+                                               "URL sugerida: " + urlSugerida + "\n\n" +
+                                               "Requisitos de la URL:\n" +
+                                               "- Debe contener todas las palabras de la keyword\n" +
+                                               "- Solo letras minúsculas, números y guiones (-)\n" +
+                                               "- Máximo 40 caracteres";
+                                
+                                url = JOptionPane.showInputDialog(null, mensaje, "Menú artículos - Publicar", JOptionPane.INFORMATION_MESSAGE);
+                                
+                                if (url == null || url.isBlank()) {
+                                    JOptionPane.showMessageDialog(null, "Publicación cancelada");
+                                    break;
+                                }
+                                
+                                // Validar la URL usando la clase Reguex
+                                if (Reguex.validarUrl(url, articleToPublish.getKeyword())) {
+                                    urlValida = true;
+                                    JOptionPane.showMessageDialog(null, "URL válida: " + url);
+                                } else {
+                                    String mensajeError = Reguex.obtenerMensajeError(url, articleToPublish.getKeyword());
+                                    JOptionPane.showMessageDialog(null, 
+                                        "URL inválida\n" +
+                                        "Error: " + mensajeError + "\n\n" +
+                                        "URL sugerida: " + urlSugerida, 
+                                        "Error de validación", 
+                                        JOptionPane.ERROR_MESSAGE);
+                                    
+                                    int continuar = JOptionPane.showConfirmDialog(null, 
+                                        "¿Desea intentar con otra URL?", 
+                                        "Reintentar", 
+                                        JOptionPane.YES_NO_OPTION);
+                                    if (continuar != JOptionPane.YES_OPTION) {
+                                        break;
+                                    }
+                                }
+                            }
+                            
+                            if (!urlValida) {
+                                JOptionPane.showMessageDialog(null, "Publicación cancelada.");
                                 break;
                             }
 
