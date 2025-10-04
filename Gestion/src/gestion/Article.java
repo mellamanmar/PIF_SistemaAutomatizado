@@ -35,7 +35,7 @@ public class Article {
     
     @Override
     public String toString(){
-        return "- ID: " + this.getArticleId()+ "\n - Keyword del artículo: "+ getKeyword() +
+        return "- ID: " + this.getArticleId()+ "\n - Keyword del articulo: "+ getKeyword() +
                 "\n - Estado: " + this.getEstado();
     }
     

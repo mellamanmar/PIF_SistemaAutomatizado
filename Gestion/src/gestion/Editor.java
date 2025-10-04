@@ -1,5 +1,6 @@
 package gestion;
 
+import java.awt.HeadlessException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
@@ -157,7 +158,7 @@ public class Editor implements Consult {
                                Seleccione la accion que quiere hacer:
                                1. Agregar redactor.
                                2. Eliminar redactor.
-                               3. Consultar redactores.
+                               3. Lista de redactores.
                                4. Consultar redactor.
                                5. Volver.
                                """, "Editor - Menú redactores", JOptionPane.INFORMATION_MESSAGE); //Revisar el id de los redactores cuando se crean
@@ -174,13 +175,18 @@ public class Editor implements Consult {
                             break;
                         }
 
-                        String priceInput = JOptionPane.showInputDialog(null, "Ingrese el precio por palabra:", "Menú redactores - Agregar", JOptionPane.INFORMATION_MESSAGE);
+                        String priceInput = JOptionPane.showInputDialog(null, "Ingrese el precio por palabra en dólares:", "Menú redactores - Agregar", JOptionPane.INFORMATION_MESSAGE);
+
                         if (priceInput == null || priceInput.isBlank()) {
                             JOptionPane.showMessageDialog(null, "Operación cancelada. Precio no ingresado.");
                             break;
                         }
 
                         double pricePerWord = Double.parseDouble(priceInput);
+                        if (pricePerWord < 0) {
+                            JOptionPane.showMessageDialog(null, "Debe ser un número válido");
+                            break;
+                        }
 
                         Redactor.Region regionSelect = (Redactor.Region) JOptionPane.showInputDialog(null, "Selecciona la region del redactor", "Menú redactores - Agregar",
                                 JOptionPane.QUESTION_MESSAGE, null, regions, regions[0]);
@@ -189,9 +195,13 @@ public class Editor implements Consult {
                             JOptionPane.showMessageDialog(null, "Operación cancelada. Región no seleccionada.");
                             break;
                         }
-
-                        Redactor newRedactor = new Redactor(nameRedactor, pricePerWord, regionSelect);
-                        addRedactor(newRedactor);
+                        if (nameRedactor.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]+")) {
+                            Redactor newRedactor = new Redactor(nameRedactor, pricePerWord, regionSelect);
+                            addRedactor(newRedactor);
+                        } else {
+                            JOptionPane.showMessageDialog(null, "El formato de entrada es inválido");
+                            break;
+                        }
 
                     } catch (NumberFormatException e) {
                         JOptionPane.showMessageDialog(null, "El redactor ingresado no es válido. Intente de nuevo." + e);
@@ -378,7 +388,7 @@ public class Editor implements Consult {
             optionActionsArticle = JOptionPane.showInputDialog(null, """
                                                     Seleccione la acción que quiere hacer:
                                                     1. Agregar artículo.
-                                                    2. Consultar artículos del editor. 
+                                                    2. Consultar artículos por asignar. 
                                                     3. Asignar artículo.
                                                     4. Revisar artículo.
                                                     5. Publicar artículo.
@@ -422,15 +432,20 @@ public class Editor implements Consult {
                                 : Article.Estado.POR_ASIGNAR;
 
                         // Crea el artículo y lo agrega a la lista
-                        Article newArticle = new Article(newKeyword, selectedRedactor, newEstado);
-                        addArticleList(newArticle);
-                        JOptionPane.showMessageDialog(null, "Artículo creado\n" + newArticle);
+                        if (newKeyword.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]+")) {
+                            Article newArticle = new Article(newKeyword, selectedRedactor, newEstado);
+                            addArticleList(newArticle);
+                            JOptionPane.showMessageDialog(null, "Artículo creado\n" + newArticle);
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Formato de entrada inválido");
+                            break;
+                        }
 
                         if (response == JOptionPane.CANCEL_OPTION) {
                             break;
                         }
-                    } catch (Exception e) {
-                        System.out.println("Algo ocurrió con la creación del artículo " + e);
+                    } catch (HeadlessException e) {
+                        System.out.println("Algo ocurrió con la creación del artículo " + e.getMessage());
                     }
                     break;
                 }
@@ -464,8 +479,8 @@ public class Editor implements Consult {
                                 JOptionPane.showMessageDialog(null, "Regresando al menú principal");
                                 break;
                             }
-                        } catch (Exception e) {
-                            System.out.println("Error al mostrar los artículos " + e + "\n-----------------------------------------");
+                        } catch (HeadlessException e) {
+                            System.out.println("Error al mostrar los artículos " + e.getMessage() + "\n-----------------------------------------");
                         }
 
                     } else {
@@ -492,7 +507,7 @@ public class Editor implements Consult {
                         try {
                             asignArticle(); // Asigna el artículo a través de la función
                         } catch (Exception e) {
-                            System.out.println("Algo sucedió al asignar el articulo " + e + "\n----------------------");
+                            System.out.println("Algo sucedió al asignar el articulo " + e.getMessage() + "\n----------------------");
                         }
 
                     } else {
@@ -522,8 +537,8 @@ public class Editor implements Consult {
                                 returnArticle(articleForReview, selectedRedactor);
                             }
 
-                        } catch (Exception e) {
-                            System.out.println("Error al corregir al redactor " + e + "\n----------------------------");
+                        } catch (HeadlessException e) {
+                            System.out.println("Error al corregir al redactor " + e.getMessage() + "\n----------------------------");
                         }
 
                     } else {
@@ -578,8 +593,8 @@ public class Editor implements Consult {
                                 break;
                             }
 
-                        } catch (Exception e) {
-                            System.out.println("Ocurrio algo en la publicación de los artículos " + e + "\n----------------------");
+                        } catch (HeadlessException e) {
+                            System.out.println("Ocurrio algo en la publicación de los artículos " + e.getMessage() + "\n----------------------");
                         }
 
                     }

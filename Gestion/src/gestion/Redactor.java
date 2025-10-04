@@ -1,5 +1,6 @@
 package gestion;
 
+import java.awt.HeadlessException;
 import java.time.LocalDate;
 import java.util.*;
 import javax.swing.JOptionPane;
@@ -171,14 +172,13 @@ public class Redactor implements Consult {
                     publishedArticles++;
                 }
             }
-
-            reporte.append("Redactor: ").append(getRedactorName()).append("\n")
+        }
+        reporte.append("Redactor: ").append(getRedactorName()).append("\n")
                     .append("ID: ").append(getRedactorId()).append("\n")
                     .append("Artículos publicados: ").append(publishedArticles).append("\n")
                     .append("Total a pagar: $").append(String.format("%.2f", totalPago)).append("\n\n");
-
-            JOptionPane.showMessageDialog(null, reporte.toString());
-        }
+        
+        JOptionPane.showMessageDialog(null, reporte.toString());
     }
 
     @Override
@@ -188,7 +188,7 @@ public class Redactor implements Consult {
         do {
             optionRedactor = JOptionPane.showInputDialog(null, """
                             1. Consultar artÍculos.
-                            2. Modificar un artículo.
+                            2. Modificar estado del artículo.
                             3. Ver reporte de mes.
                             4. Volver.
                             Seleccione la accion que quiere hacer: """, "Menú Redactor", JOptionPane.INFORMATION_MESSAGE);
@@ -203,8 +203,8 @@ public class Redactor implements Consult {
                         JOptionPane.showMessageDialog(null, "Ingresando a sus articulos");
 
                         showArticlesRedactor();
-                    } catch (Exception e) {
-                        System.out.println("No le logró mostrar los articulos asignados" + e);
+                    } catch (HeadlessException e) {
+                        System.out.println("No le logró mostrar los articulos asignados" + e.getMessage());
                     }
                     break;
                 }
@@ -238,8 +238,8 @@ public class Redactor implements Consult {
                             JOptionPane.showMessageDialog(null, "El estado del artículo " + redactorArticle.getArticleId() + " se cambió a " + redactorArticle.getEstado());
                             break;
 
-                        } catch (Exception e) {
-                            System.out.println("No le logro modicar el articulo" + e);
+                        } catch (HeadlessException | NumberFormatException e) {
+                            System.out.println("No le logro modicar el articulo" + e.getMessage());
                         }
                     } else {
                         JOptionPane.showMessageDialog(null, "No tiene artículos por modificar.");
