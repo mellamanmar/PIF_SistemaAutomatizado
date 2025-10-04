@@ -4,6 +4,7 @@ import java.awt.HeadlessException;
 import java.time.LocalDate;
 import java.util.*;
 import javax.swing.JOptionPane;
+import teorico.Automata;
 
 /**
  *
@@ -85,15 +86,43 @@ public class Redactor implements Consult {
     }
 
     public void addArticle(Article article) {
-        article.setEstado(Article.Estado.ASIGNADO);
+        // El estado ya debe estar cambiado por el autómata en el Editor
         articlesQueue.offerLast(article);
     }
 
     public void completedArticles(Article article, int numWords, Editor editor) {
         article.setWordNums(numWords);
-        article.setEstado(Article.Estado.COMPLETADO);
-        if (!GestionEditorial.editor.listArticles.contains(article)) {
-            GestionEditorial.editor.listArticles.add(article);
+        
+        // Verificar el estado actual del artículo para determinar la acción correcta
+        boolean transicionExitosa = false;
+        
+        if (article.getEstado() == Article.Estado.ASIGNADO) {
+            // Artículo normal: ASIGNADO -> COMPLETADO
+            transicionExitosa = article.procesarAccion(Automata.Accion.COMPLETAR);
+            if (transicionExitosa) {
+                System.out.println("Artículo completado - Estado: " + article.getEstado());
+            }
+        } else if (article.getEstado() == Article.Estado.DEVUELTO) {
+            // Artículo devuelto: DEVUELTO -> ASIGNADO -> COMPLETADO
+            // Primero devolverlo a ASIGNADO
+            if (article.procesarAccion(Automata.Accion.DEVOLVER)) {
+                System.out.println("Artículo devuelto a redactor - Estado: " + article.getEstado());
+                // Luego completarlo
+                if (article.procesarAccion(Automata.Accion.COMPLETAR)) {
+                    System.out.println("Artículo completado después de devolución - Estado: " + article.getEstado());
+                    transicionExitosa = true;
+                }
+            }
+        }
+        
+        if (transicionExitosa) {
+            if (!GestionEditorial.editor.listArticles.contains(article)) {
+                GestionEditorial.editor.listArticles.add(article);
+            }
+        } else {
+            System.out.println("Error: No se pudo cambiar el estado del artículo a COMPLETADO");
+            System.out.println("Estado actual: " + article.getEstado());
+            System.out.println("Acciones válidas: " + java.util.Arrays.toString(article.getAccionesValidas()));
         }
     }
 
